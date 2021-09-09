@@ -17,9 +17,10 @@ class UsernameGenerator():
         self.__level = self.LEVEL[level]
         self.__separators = self._set_separators(separators=separators)
         
-        # Replace "" by " " in separators list to creat limiters list
+        # Replace "" by " " and "'" in separators list to create limiters list
         self.__limiters = [x for x in self.__separators if x != ""]
         self.__limiters.append(" ")
+        self.__limiters.append("'")
 
     def _set_separators(self,separators: str):
         """Set the separators used for the generation 
@@ -71,7 +72,7 @@ class UsernameGenerator():
         """
 
         # Define vowels list
-        vowels = ("a","e","i","o","u","y")
+        vowels = ["a","e","i","o","u","y"]
 
         # Replace "" by " " in separators list
         sep = [x for x in self.__separators if x != ""]
@@ -109,7 +110,6 @@ class UsernameGenerator():
 
         return names
 
-    # Fonction de génération des noms d"utilisateurs en fonction des informations d"une personne
     def generate_usernames(self,people: User):
         """Generate usernames from informations of a User
 

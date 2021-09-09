@@ -36,24 +36,38 @@ def main(args):
 
     username_generator = UsernameGenerator(level=args.level)
     
-    print("\n======= PARAMETERS =======")
+    print("\n============= PARAMETERS =============")
     print(f"Generating level : {username_generator.level}")
     print(f"Using separators : {username_generator.separators}")
 
-    print("\n========== USER ==========")
+    print("\n================ USER ================")
     user.print()
         
     usernames = username_generator.generate_usernames(user)
 
-    print("\n======== USERNAMES =======",end=" ")
-    print(f"({str(len(usernames))} generated)")
-    print(*usernames,sep=", ")
+    print("\n============== USERNAMES =============")
+    print(f"Number    : {len(usernames)} usernames")
+    print(f"Usernames {'(only the first 100) ' if len(usernames)>100 else ''}:",end="\n\t")
+    printable_usernames = usernames[:100]
+    print(*printable_usernames,sep=", ",end=" [...]\n" if len(usernames)>100 else '\n')
 
+
+    output = {
+        "firstname" : user.firstname,
+        "middlename" : user.middlename,
+        "lastname" : user.lastname,
+        "username" : user.username,
+        "number" : user.number,
+        "usernames" : usernames,
+    }
+    output_name = (user.firstname+user.middlename+user.lastname).replace(" ","")
+    if not os.path.isdir(f"{output_location}") and output_location != "./output/":
+        print(f"\nNo such directory \'{output_location}\'. Saving in \'./output/\'")
+        output_location = "./output/"
     if output_location == "./output/" and not os.path.isdir("./output/"):
         os.mkdir("./output/")
-    with open((f"./{output_location}/output.json"),"w") as f:
-        json.dump({"usernames" : usernames},f,indent=2)
-
+    with open((f"{output_location}/{output_name}.json"),"w") as f:
+        json.dump(output,f,indent=2)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -106,12 +120,6 @@ if __name__ == "__main__":
         nargs="?",
         default="./output/",
         help="choose output location (default is \"./output/\")",
-    )
-    parser.add_argument(
-        "-s","--save",
-        default=False,
-        action="store_true",
-        help="save all the usernames",
     )
     parser.add_argument(
         "--level",
