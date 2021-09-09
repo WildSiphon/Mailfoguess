@@ -12,12 +12,12 @@ def main(args):
     printBanner()
 
     if (args.firstname+args.middlename+args.lastname+args.username) == "":
-        print("\nPlease provide indications to generate potentials emails")
-        firstname  = input("\nFirstname ?\n")
-        middlename = input("\nMiddlename ?\n")
-        lastname   = input("\nLastname ?\n")
-        username   = input("\nUsername ?\n")
-        number     = input("\nNumber ?\n")
+        print("\nPlease provide indications to generate potentials emails (leave empty for \"None\")")
+        firstname  = input("\nFirstname ?\n> ")
+        middlename = input("\nMiddlename ?\n> ")
+        lastname   = input("\nLastname ?\n> ")
+        username   = input("\nUsername ?\n> ")
+        number     = input("\nNumber ?\n> ")
     else:
         firstname  = args.firstname
         middlename = args.middlename
@@ -46,8 +46,8 @@ def main(args):
     usernames = username_generator.generate_usernames(user)
 
     print("\n======== USERNAMES =======",end=" ")
-    print(f"{str(len(usernames))} generated")
-    print(*usernames,sep=",")
+    print(f"({str(len(usernames))} generated)")
+    print(*usernames,sep=", ")
 
     if output_location == "./output/" and not os.path.isdir("./output/"):
         os.mkdir("./output/")
@@ -117,7 +117,7 @@ if __name__ == "__main__":
         "--level",
         dest="level",
         choices=["min","low","high","max"],
-        default='min',
+        default="min",
         help="choose level of generation (default \'min\')",
     )
 

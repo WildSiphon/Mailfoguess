@@ -248,9 +248,9 @@ class UsernameGenerator():
                 usernames_with_number.extend(toAdd)
             user_list.extend(usernames_with_number)
 
-        # Suppressing doubles 
+        # Suppressing doubles and sorting
         user_list = list(dict.fromkeys(user_list))
-        user_list.sort()    # Sort
+        user_list.sort()
         return user_list
 
     @property
