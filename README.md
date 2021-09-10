@@ -138,7 +138,7 @@ Creating lists of names to use based on given names :
 
 | Level       | Consequences                                                 |
 | ----------- | ------------------------------------------------------------ |
-| **Minimal** | Add an empty name<br><br>If the {first,middle,last,user}**name is composed** (ex : Jean-Michel) :<br>   - add each part of the name separatly (ex : ["jean","michel"])<br>   - add the all name separated by each separator (ex : ["jeanmichel","jean-michel"…])<br>   + skipping particles (2 letters word) in all the names except in usernames<br><br>If **name is not composed** :<br>   - add name |
+| **Minimal** | Add an empty name<br><br>If {first,middle,last,user}**name is composed** (ex : Jean-Michel) :<br>   - add each part of the name separatly (ex : ["jean","michel"])<br>   - add the all name separated by each separator (ex : ["jeanmichel","jean-michel"…])<br>   + skipping particles (2 letters word) in all the names except in usernames<br><br>If **name is not composed** :<br>   - add name |
 | **Low**     | Add the vowelless lastname where all consonants are unique   |
 | **High**    | Add the vowelless lastname where all double consonants are kept |
 | **Maximal** |                                                              |
