@@ -55,7 +55,7 @@ class User():
         if self._username != "":
             print(f"Username   : {self._username}")
         if self._number:
-            print(f"Number     : {', '.join(self._number)}")
+            print(f"Number     : {' and '.join(self._number[::-1])}")
 
     @property
     def firstname(self):

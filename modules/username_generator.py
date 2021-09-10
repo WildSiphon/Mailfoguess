@@ -1,4 +1,4 @@
-from user import User
+from modules.user import User
 
 class UsernameGenerator():
     """Create a generator of usernames
@@ -110,7 +110,7 @@ class UsernameGenerator():
 
         return names
 
-    def generate_usernames(self,people: User):
+    def generate(self,people: User):
         """Generate usernames from informations of a User
 
         :param people: all informations of a user
