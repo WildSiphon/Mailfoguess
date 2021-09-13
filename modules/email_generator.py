@@ -1,4 +1,5 @@
 import json
+<<<<<<< HEAD
 import time
 import trio,httpx
 
@@ -9,6 +10,8 @@ from holehe.modules.mails.laposte import laposte
 from holehe.modules.mails.protonmail import protonmail
 from holehe.modules.mails.yahoo import yahoo
 from holehe.modules.software.office365 import office365
+=======
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
 
 class EmailGenerator():
     """Create a generator of emails
@@ -19,8 +22,12 @@ class EmailGenerator():
 
     def __init__(self,country="fr"):
         """The constructor."""
+<<<<<<< HEAD
         self.__providers  = self._set_providers(country=country)
         self.__validators = ["gmail","laposte","protonmail","yahoo","outlook"]
+=======
+        self.__providers = self._set_providers(country=country)
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
 
     def _set_providers(self,country):
         """Set the providers used for the generation 
@@ -43,16 +50,26 @@ class EmailGenerator():
         :rtype: str
         """
 
+<<<<<<< HEAD
         mail = username+"@"+domain
 
+=======
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
         # https://support.google.com/mail/answer/9211434?hl=en
         if 'gmail' in domain:
             if (len(username) < 6) or (len(username) > 30):
                 return
             if ('-' in username) or ('_' in username):
                 return
+<<<<<<< HEAD
             # if ('.' in username):
             #     return
+=======
+            # if ('.' in username): # charactère ignoré par google (un.tel = untel)
+            #     return
+            # if not trio.run(validate_mails,mail):
+            #     return ({'mail' : mail, 'exist' : False})
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
             
         # https://login.yahoo.com/account/create
         if 'yahoo' in domain:
@@ -60,22 +77,44 @@ class EmailGenerator():
                 return
             if ('-' in username): # characters interdits
                 return
+<<<<<<< HEAD
+=======
+            # if not trio.run(validate_mails,mail):
+            #     return ({'mail' : mail, 'exist' : False})
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
             
         if 'outlook' in domain:
             if (len(username) < 1) or (len(username) > 64):
                 return
+<<<<<<< HEAD
+=======
+            # if not trio.run(validate_mails,mail):
+            #     return ({'mail' : mail, 'exist' : False})
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
         
         # https://compte.laposte.net/inscription/index.do?srv_gestion=lapostefr
         if 'laposte' in domain:
             if (len(username) < 4) or (len(username) > 49):
                 return
+<<<<<<< HEAD
+=======
+            # if not trio.run(validate_mails,mail):
+            #     return ({'mail' : mail, 'exist' : False})
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
         
         # https://mail.protonmail.com/create/
         if 'protonmail' in domain:
             if (len(username) < 1) or (len(username) > 40):
                 return
             # if ('-' in username) or ('_' in username) or ('.' in username):
+<<<<<<< HEAD
             #     return
+=======
+            #     # charactère ignoré par protonmail (un.tel = un-tel = un_tel = untel)
+            #     return
+            # if not trio.run(validate_mails,mail):
+            #     return ({'mail' : mail, 'exist' : False})
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
             
         # https://subscribe.free.fr/accesgratuit/
         if 'free' in domain:
@@ -89,6 +128,7 @@ class EmailGenerator():
             if (len(username) < 1) or (len(username) > 64):
                 return
 
+<<<<<<< HEAD
         return mail
 
     async def _validate_mails(self,email):
@@ -129,6 +169,9 @@ class EmailGenerator():
             # print(f": {validated_emails[email]}")
         print("\tDone")
         return validated_emails
+=======
+        return username+"@"+domain
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
 
     def generate(self,usernames: list):
         """Generate emails from a list of usernames
@@ -136,6 +179,7 @@ class EmailGenerator():
         :param usernames: list of usernames
         :type people: list
 
+<<<<<<< HEAD
         :return: all the emails generated sorted by provider
         :rtype: dict
         """
@@ -147,6 +191,19 @@ class EmailGenerator():
                 if email: emails[domain].append(email)
         return emails
     
+=======
+        :return: all the emails generated
+        :rtype: list
+        """
+        emails = []
+        for domain in self.__providers:
+            for username in usernames:
+                email = self._create_email(domain=domain,username=username)
+                if email:
+                    emails.append(email)
+        return emails
+
+>>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
     @property
     def providers(self):
         return self.__providers
