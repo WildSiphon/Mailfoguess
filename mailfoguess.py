@@ -4,12 +4,9 @@ import argparse
 from modules.user import User
 from modules.username_generator import UsernameGenerator
 from modules.email_generator import EmailGenerator
-<<<<<<< HEAD
 
 NB_PRINT_USERNAME = 100
 NB_PRINT_EMAIL = 50
-=======
->>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
 
 def printBanner():
     for line in open("assets/banner.txt","r"):
@@ -60,7 +57,6 @@ def main(args):
     # printable_usernames = usernames[:NB_PRINT_USERNAME]
     # print(*printable_usernames,sep=", ",end=" [...]\n" if len(usernames)>NB_PRINT_USERNAME else '\n')
 
-<<<<<<< HEAD
     emails = email_generator.generate(usernames)
     print("\n================================ EMAILS ==============================")
     print(f"Emails       : {sum(len(domain) for domain in emails)} generated (with {len(email_generator.providers)} different domains)")
@@ -103,40 +99,6 @@ def main(args):
         os.mkdir("./output/")
     with open((f"{output_location}/{output_name}.json"),"w") as f:
         json.dump(output,f,indent=2)
-=======
-    print("\n================ USER ================")
-    user.print()
-        
-    usernames = username_generator.generate(user)
-    print("\n============== USERNAMES =============")
-    print(f"Number    : {len(usernames)} usernames")
-    print(f"Usernames {'(only the first 100) ' if len(usernames)>100 else ''}:",end="\n\t")
-    printable_usernames = usernames[:100]
-    print(*printable_usernames,sep=", ",end=" [...]\n" if len(usernames)>100 else '\n')
-
-    emails = email_generator.generate(usernames)
-    print("\n================ EMAILS ==============")
-    print(f"Number       : {len(emails)} emails with {len(email_generator.providers)} different domains")
-    print(f"Domains used : {', '.join(email_generator.providers)}")
-    #print(*emails,sep="\n")
-
-    # output = {
-    #     "firstname"  : user.firstname,
-    #     "middlename" : user.middlename,
-    #     "lastname"   : user.lastname,
-    #     "username"   : user.username,
-    #     "number"     : user.number,
-    #     "usernames"  : usernames,
-    # }
-    # output_name = (user.firstname+user.middlename+user.lastname).replace(" ","")
-    # if not os.path.isdir(f"{output_location}") and output_location != "./output/":
-    #     print(f"\nNo such directory \'{output_location}\'. Saving in \'./output/\'")
-    #     output_location = "./output/"
-    # if output_location == "./output/" and not os.path.isdir("./output/"):
-    #     os.mkdir("./output/")
-    # with open((f"{output_location}/{output_name}.json"),"w") as f:
-    #     json.dump(output,f,indent=2)
->>>>>>> 6bc37d2a6d34678c1e3fe0a0417ceba63461da3c
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
