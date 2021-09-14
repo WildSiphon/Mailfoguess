@@ -1,6 +1,4 @@
-# **OSINT TOOL UNDER DEVELOPMENT**
-
-# **COME BACK LATER**
+# **OSINT TOOL UNDER DEVELOPMENT, COME BACK LATER**
 
 # [Mailfoguess](https://github.com/WildSiphon/Mailfoguess)
 
@@ -14,7 +12,7 @@ An email address is made up from **local-part**, the symbol **@**, and a **domai
 
 - **Create *a lot* of possible local-part** from informations given and following generation level 
 - **Add @domain to all local-part** respecting the conditions of creation of mail of these domains
-- **Verify these mails** (still working on it but know how to do it)
+- **Verify these mails** (only for ["gmail","google","laposte","protonmail","yahoo"])
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" alt="hammer_and_wrench" style="zoom:33%;" /> Installation
 
@@ -31,7 +29,7 @@ pip3 install -r requirements.txt
 ### Usual use
 
 ```
-usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [-o [OUTPUT_LOCATION]] [--level {min,low,high,max}]
+usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [-o [OUTPUT_LOCATION]] [-Y] [--level {min,low,high,max}]
 
 python script to guess the potentials email adress of someone
 
@@ -43,17 +41,94 @@ optional arguments:
   -u [USERNAME]         set target's username
   -n [NUMBER]           set a number to use (year of birth, locality...)
   -o [OUTPUT_LOCATION]  choose output location (default is "./output/")
+  -Y, --yes             assumes "yes" as the answer to all questions of validation
   --level {min,low,high,max}
                         choose level of generation (default 'min')
 ```
 
-**Example**
+**Examples**
+
++ Classic use in command line in "no interactions" mod :
 
 ```bash
-~$ python3 mailfoguess.py -f Bill -m "The Gater" -l Gates -u billythekid -n 1955 --level max
+$ python3 mailfoguess.py -f P* -l C* --yes
+```
+​	Print in console :
+
+```
+[banner]
+
+================================ USER ================================
+Firstname  : p*
+Lastname   : c*
+
+============================= LOCAL-PART =============================
+Number    : 14 generated
+Generating level : Minimal
+Using separators : ['', '-', '.', '_']
+
+================================ EMAILS ==============================
+Emails       : 57 generated (with 5 different domains)
+Domains used :
+ gmail.com	: 7
+ yahoo.com	: 11
+ yahoo.fr	: 11
+ laposte.net	: 14
+ protonmail.com	: 14
+
+#~~~~~~~~~~~~~~~~~~~~ VALIDATION ~~~~~~~~~~~~~~~~~~~~#
+> Processing gmail.com (7)...	 |################################| 100.0% - 0s	Done
+> Processing yahoo.com (11)...	 |################################| 100.0% - 0s	Done
+> Processing yahoo.fr (11)...	 |################################| 100.0% - 0s	Done
+> Processing laposte.net (14)...	 |################################| 100.0% - 0s	Done
+> Processing protonmail.com (14)...	 |################################| 100.0% - 0s	Done
+
+#~~~~~~~~~~~~~~~~~~~~~ RESULTS ~~~~~~~~~~~~~~~~~~~~~~#
+14 verified adress in total on 57
+0 are unverified and 43 doesn't exist
+By provider :
+ gmail.com	: 6 verified adress found!
+ protonmail.com	: 8 verified adress found!
 ```
 
-// EXAMPLE.gif
++ Use in interactions mod (no indications provided to generate potentials emails) :
+
+```bash
+$ python3 mailfoguess.py
+$ python3 mailfoguess.py --level high
+$ python3 mailfoguess.py --yes
+```
+
+​	If so, you will be ask about that :
+
+```
+[banner]
+
+Please provide indications to generate potentials emails (leave empty for "None")
+
+Firstname ?
+> P*
+
+Middlename ?
+> 
+
+Lastname ?
+> C*
+
+Username ?
+> 
+
+Number ?
+> 
+```
+
++ To generate and verify the maximum about one person without any interactions. 
+
+```bash
+~$ python3 mailfoguess.py -f Bill -m "The Gater" -l Gates -u billythekid -n 1955 --level max --yes
+```
+
+​	We strongly recommend that you **do not** do this as the script could last a long time. I tried this one for fun and it's still running (almost 10 000 email address were generated)…
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4da.png" alt="books" style="zoom:33%;" />Output
 
@@ -61,72 +136,100 @@ Results are displayed in console, but all the informations are recorded and stor
 
 ### Example
 
-`output.json`
+`p*c*.json`
 
 ```json
 {
-  "firstname": "bill",
-  "middlename": "the gater",
-  "lastname": "gates",
-  "username": "billythekid",
-  "number": [
-    "55",
-    "1955"
+  "firstname": "p*",
+  "middlename": null,
+  "lastname": "c*",
+  "username": null,
+  "number": null,
+  "local-parts": [
+    "c*",
+    "p-c*",
+    "p.c*",
+    "p_c*",
+    "pc*",
+    "p*",
+    "p*-c",
+    "p*-c*",
+    "p*.c",
+    "p*.c*",
+    "p*_c",
+    "p*_c*",
+    "p*c",
+    "p*c*"
   ],
-  "usernames": [
-    "b-gater",
-    "b-gater-1955",
-    "b-gater-55",
-    "b-gater-gates",
-    "b-gater-gates-1955",
-    "b-gater-gates-55",
-    "b-gater-gts",
-    "b-gater-gts-1955",
-    "b-gater-gts-55",
-    "b-gates",
-    "b-gates-1955",
-    "b-gates-55",
-    "b-gates-gater",
-    "b-gates-gater-1955",
-    "b-gates-gater-55",
-    "b-gates-the",
-    "b-gates-the-1955",
-    "b-gates-the-55",
-    "b-gates-the-gater",
-    "b-gates-the-gater-1955",
-    "b-gates-the-gater-55",
-    "b-gts",
-    "b-gts-1955",
-    "b-gts-55",
-    "b-gts-gater",
-    "b-gts-gater-1955",
-    "b-gts-gater-55",
-    "b-gts-the",
-    "b-gts-the-1955",
-    "b-gts-the-55",
-    [...]
-    "thegates",
-    "thegates1955",
-    "thegates55",
-    "thegatesb",
-    "thegatesb1955",
-    "thegatesb55",
-    "thegatesbill",
-    "thegatesbill1955",
-    "thegatesbill55",
-    "thegbill",
-    "thegbill1955",
-    "thegbill55",
-    "thegts",
-    "thegts1955",
-    "thegts55",
-    "thegtsb",
-    "thegtsb1955",
-    "thegtsb55",
-    "thegtsbill",
-    "thegtsbill1955",
-    "thegtsbill55"
-  ]
+  "emails": {
+    "gmail.com": {
+      "p.c*@gmail.com": true,
+      "pc*@gmail.com": true,
+      "p*@gmail.com": false,
+      "p*.c@gmail.com": true,
+      "p*.c*@gmail.com": true,
+      "p*c@gmail.com": true,
+      "p*c*@gmail.com": true
+    },
+    "yahoo.com": {
+      "c*@yahoo.com": false,
+      "p.c*@yahoo.com": false,
+      "p_c*@yahoo.com": false,
+      "pc*@yahoo.com": false,
+      "p*@yahoo.com": false,
+      "p*.c@yahoo.com": false,
+      "p*.c*@yahoo.com": false,
+      "p*_c@yahoo.com": false,
+      "p*_c*@yahoo.com": false,
+      "p*c@yahoo.com": false,
+      "p*c*@yahoo.com": false
+    },
+    "yahoo.fr": {
+      "c*@yahoo.fr": false,
+      "p.c*@yahoo.fr": false,
+      "p_c*@yahoo.fr": false,
+      "pc*@yahoo.fr": false,
+      "p*@yahoo.fr": false,
+      "p*.c@yahoo.fr": false,
+      "p*.c*@yahoo.fr": false,
+      "p*_c@yahoo.fr": false,
+      "p*_c*@yahoo.fr": false,
+      "p*c@yahoo.fr": false,
+      "p*c*@yahoo.fr": false
+    },
+    "laposte.net": {
+      "c*@laposte.net": false,
+      "p-c*@laposte.net": false,
+      "p.c*@laposte.net": false,
+      "p_c*@laposte.net": false,
+      "pc*@laposte.net": false,
+      "p*@laposte.net": false,
+      "p*-c@laposte.net": false,
+      "p*-c*@laposte.net": false,
+      "p*.c@laposte.net": false,
+      "p*.c*@laposte.net": false,
+      "p*_c@laposte.net": false,
+      "p*_c*@laposte.net": false,
+      "p*c@laposte.net": false,
+      "p*c*@laposte.net": false
+    },
+    "protonmail.com": {
+      "c*@protonmail.com": false,
+      "p-c*@protonmail.com": true,
+      "p.c*@protonmail.com": true,
+      "p_c*@protonmail.com": true,
+      "pc*@protonmail.com": false,
+      "p*@protonmail.com": false,
+      "p*-c@protonmail.com": true,
+      "p*-c*@protonmail.com": true,
+      "p*.c@protonmail.com": true,
+      "p*.c*@protonmail.com": false,
+      "p*_c@protonmail.com": true,
+      "p*_c*@protonmail.com": false,
+      "p*c@protonmail.com": false,
+      "p*c*@protonmail.com": true
+    }
+  }
 }
 ```
 
@@ -145,6 +248,11 @@ Creating lists of names to use based on given names :
 
 ### Generating local-part
 
++ **{first,middle,last,user}** represents **{firstname,middlename,lastname,username}**
++ **{f,m,l}ini** represents the initials of **f**irstname, **m**iddlename or **l**astname
+  + If the name is composed, the initials are the concatenation of all initials' part
++ **°** represent a **separator**
+
 | Level       | Consequences                                                 |
 | ----------- | ------------------------------------------------------------ |
 | **Minimal** | user<br><br>first<br>first ° last<br>first ° lini<br>first ° middle ° last<br>first ° middle ° lini<br>fini  ° last<br>fini  ° middle ° last<br><br>last |
@@ -152,17 +260,17 @@ Creating lists of names to use based on given names :
 | **High**    | first ° last ° middle<br>first ° last ° mini <br>first ° lini  ° middle<br><br>middle ° first<br>middle ° fini<br>mini     ° first<br>mini     ° last<br><br>last   ° mini<br>last   ° middle ° first<br>last   ° mini     ° first<br>lini    ° middle ° first |
 | **Maximal** | first  ° mini ° last<br><br>middle ° first ° last<br>middle ° last  ° first<br>middle ° first ° lini<br>middle ° lini   ° first<br>mini     ° first ° last<br>mini     ° last  ° first<br><br>last ° first ° mini |
 
-+ **{first,middle,last,user}** represents **{firstname,middlename,lastname,username}**
-+ **{f,m,l}ini** represents the initials of **f**irstname, **m**iddlename or **l**astname
-  + If the name is composed, the initials are the concatenation of all initials' part
-+ **°** represent a **separator**
-
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png" alt="memo" style="zoom:33%;" /> Stuff to add
 
 + Colors in the printed output (feel free to help me with that)
-+ Creation of email (already working on it)
-+ Verification on email (already working on it)
-+ Option to choose a country to define the list of domains to use 
++ ~~Creation of email~~
++ ~~Verification on email~~
++ Add options in command line to change separators and choose providers to use
++ Option to choose a country to define the list of domains
+
+## References
+
++ This tool which help me to verify email address : https://github.com/megadose/holehe
 
 ## License
 

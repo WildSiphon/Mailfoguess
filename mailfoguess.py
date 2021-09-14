@@ -5,8 +5,8 @@ from modules.user import User
 from modules.localpart_generator import LocalPartGenerator
 from modules.email_generator import EmailGenerator
 
-NB_PRINT_USERNAME = 100
-NB_PRINT_EMAIL = 50
+# NB_PRINT_USERNAME = 100
+# NB_PRINT_EMAIL = 50
 
 def printBanner():
     for line in open("assets/banner.txt","r"):
@@ -15,13 +15,15 @@ def printBanner():
 def main(args):
     printBanner()
 
-    if args.firstname and args.middlename and args.lastname and args.username:
+    if not (args.firstname or args.middlename or args.lastname or args.username):
         print("\nPlease provide indications to generate potentials emails (leave empty for \"None\")")
         firstname  = input("\nFirstname ?\n> ")
         middlename = input("\nMiddlename ?\n> ")
         lastname   = input("\nLastname ?\n> ")
         username   = input("\nUsername ?\n> ")
         number     = input("\nNumber ?\n> ")
+        if firstname+middlename+lastname+username == "":
+            exit("\nNot enough indications provided. Try [-h] to open the help message.")
     else:
         firstname  = args.firstname
         middlename = args.middlename
@@ -59,7 +61,7 @@ def main(args):
 
     emails = email_generator.generate(usernames)
     print("\n================================ EMAILS ==============================")
-    print(f"Emails       : {sum(len(domain) for domain in emails)} generated (with {len(email_generator.providers)} different domains)")
+    print(f"Emails       : {sum(len(emails[provider]) for provider in emails)} generated (with {len(email_generator.providers)} different domains)")
     print(f"Domains used :")
     for provider in email_generator.providers:
         print(f" {provider}\t: {len(emails[provider])}")
@@ -80,7 +82,7 @@ def main(args):
             if emails[provider][email] == None: unverified += 1
             elif emails[provider][email]: verified += 1
             else: inexistent += 1
-        nb_emails += 1
+            nb_emails += 1
     print(f"{verified} verified adress in total on {nb_emails}")
     print(f"{unverified} are unverified and {inexistent} doesn\'t exist")
     if verified:
@@ -100,7 +102,10 @@ def main(args):
         "local-parts" : usernames,
         "emails"      : emails,
     }
-    output_name = (user.firstname+user.middlename+user.lastname).replace(" ","")
+    output_name = f"{user.firstname if user.firstname else ''}" + \
+                f"{user.middlename if user.middlename else ''}" + \
+                f"{user.lastname if user.lastname else ''}"
+    output_name.replace(" ","")
     if not os.path.isdir(f"{output_location}") and output_location != "./output/":
         print(f"\nNo such directory \'{output_location}\'. Saving in \'./output/\'")
         output_location = "./output/"

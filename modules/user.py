@@ -27,9 +27,9 @@ class User():
 
     def _define_name(self,name):
         """Format *name"""
-        if name == "": return None
+        if not name or name == "": return None
 
-        name = name.strip().lower() if name else ""
+        name = name.strip().lower()
         accents = {
             "a" : ["à", "ã", "á", "â", "ä", "å"],
             "e" : ["é", "è", "ê", "ë"],
@@ -51,13 +51,13 @@ class User():
 
     def print(self):
         """Print user's informations"""
-        if self._firstname != "":
+        if self._firstname:
             print(f"Firstname  : {self._firstname}") 
-        if self._middlename != "":
+        if self._middlename:
             print(f"Middlename : {self._middlename}") 
-        if self._lastname != "":
+        if self._lastname:
             print(f"Lastname   : {self._lastname}") 
-        if self._username != "":
+        if self._username:
             print(f"Username   : {self._username}")
         if self._number:
             print(f"Number     : {' and '.join(self._number[::-1])}")
