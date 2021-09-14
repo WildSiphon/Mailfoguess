@@ -10,34 +10,39 @@ class User():
 
     def __init__(self,firstname,middlename,lastname,username,number):
         """The constructor."""
-        self._firstname = self._define_name(firstname)
+        self._firstname  = self._define_name(firstname)
         self._middlename = self._define_name(middlename)
-        self._lastname = self._define_name(lastname)
-        self._username = self._define_name(username)
-        self._number = self._define_number(number) if number else None
+        self._lastname   = self._define_name(lastname)
+        self._username   = self._define_name(username)
+        self._number     = self._define_number(number)
 
     def _define_number(self,number):
         """Format number"""
-        if number.isnumeric():
+        if not number:
+            return None
+        elif number.isnumeric():
             return [number[-2:],number] if len(number)>2 else [number]
-        return None
+        else:
+            return None
 
     def _define_name(self,name):
         """Format *name"""
+        if name == "": return None
+
         name = name.strip().lower() if name else ""
         accents = {
-            'a' : ['à', 'ã', 'á', 'â', 'ä', 'å'],
-            'e' : ['é', 'è', 'ê', 'ë'],
-            'i' : ['î', 'ï', 'ì', 'í'],
-            'o' : ['ô', 'ö', 'ò', 'ó', 'õ', 'ø'],
-            'u' : ['ù', 'ü', 'û', 'ú'],
-            'y' : ['ÿ', 'ý'],
-            'c' : ['ç'],
-            's' : ['š'],
-            'z' : ['ž'],
-            'n' : ['ñ'],
-            'ae': ['æ'],
-            'oe': ['œ'],
+            "a" : ["à", "ã", "á", "â", "ä", "å"],
+            "e" : ["é", "è", "ê", "ë"],
+            "i" : ["î", "ï", "ì", "í"],
+            "o" : ["ô", "ö", "ò", "ó", "õ", "ø"],
+            "u" : ["ù", "ü", "û", "ú"],
+            "y" : ["ÿ", "ý"],
+            "c" : ["ç"],
+            "s" : ["š"],
+            "z" : ["ž"],
+            "n" : ["ñ"],
+            "ae": ["æ"],
+            "oe": ["œ"],
         }
         for char in accents:
             for accented_char in accents[char]:

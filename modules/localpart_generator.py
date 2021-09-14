@@ -1,6 +1,6 @@
 from modules.user import User
 
-class UsernameGenerator():
+class LocalPartGenerator():
     """Create a generator of usernames
 
     :param level: level of generation, defaults to minimal
@@ -70,6 +70,8 @@ class UsernameGenerator():
         :param user: if the name is an username, default False
         :type user: bool
         """
+
+        if not name: name = ""
 
         # Define vowels list
         vowels = ["a","e","i","o","u","y"]

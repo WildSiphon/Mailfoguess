@@ -8,7 +8,6 @@ from holehe.modules.mails.google import google
 from holehe.modules.mails.laposte import laposte
 from holehe.modules.mails.protonmail import protonmail
 from holehe.modules.mails.yahoo import yahoo
-from holehe.modules.software.office365 import office365
 
 class EmailGenerator():
     """Create a generator of emails
@@ -20,7 +19,7 @@ class EmailGenerator():
     def __init__(self,country="fr"):
         """The constructor."""
         self.__providers  = self._set_providers(country=country)
-        self.__validators = ["gmail","laposte","protonmail","yahoo","outlook"]
+        self.__validators = ["gmail","google","laposte","protonmail","yahoo"]
 
     def _set_providers(self,country):
         """Set the providers used for the generation 
@@ -91,44 +90,71 @@ class EmailGenerator():
 
         return mail
 
-    async def _validate_mails(self,email):
+    async def _validate_email(self,email):
         out = []
         client = httpx.AsyncClient()
         
-        domain = email.split('@')[1].split('.')[0]
-        if domain not in self.__validators:
-            return "unverified"
-        elif domain == 'gmail':
+        domain = email.split("@")[-1].split(".")[0]
+
+        if domain in ["gmail","google"]:
             await google(email, client, out)
-        elif domain == 'laposte':
+        elif domain == "laposte":
             await laposte(email, client, out)
-        elif domain == 'protonmail':
+        elif domain == "protonmail":
             await protonmail(email, client, out)
-        elif domain == 'yahoo':
+        elif domain == "yahoo":
             await yahoo(email, client, out)
-        elif domain == 'outlook':
-            await office365(email, client, out)
 
         await client.aclose()
         
         return out[0]['exists']
 
-    def validate(self,emails: list,provider=None):
+    def validate(self,emails:dict={},validate_all=False):
         validated_emails = {}
 
-        bar = Bar(f"\t {' '+provider if provider else ''} ({len(emails)})...\t",suffix='%(percent).1f%% - %(eta)ds',max=len(emails))
-        for email in emails:
-            validated_emails[email] = []
-            # print(f"   {email}",end=" ")
-            while validated_emails[email] == []:
-                try:
-                    validated_emails[email] = trio.run(self._validate_mails,email)
-                except Exception as e:
-                    pass
-            bar.next()
-            # print(f": {validated_emails[email]}")
-        print("\tDone")
+        for provider in emails:
+            validated_emails[provider] = {}
+
+            if provider.split(".")[0] not in self.__validators:
+                print(f"Can't verify {provider.split('.')[0]}\'s mails validity")
+                for email in emails[provider]:
+                    validated_emails[provider][email] = None
+
+            else:
+                if validate_all: answer = "y"
+                else:
+                    answer = input(f"Would you like to verify {provider} ({len(emails[provider])})\t[N/y] ")
+                
+                if answer in ["y","Y","yes","Yes","yEs","yeS","YEs","YeS","yES","YES"]:
+                    bar = Bar(
+                        f"> Processing{' '+provider if provider else ''} ({len(emails[provider])})...\t",
+                        suffix='%(percent).1f%% - %(eta)ds',
+                        max=len(emails[provider])
+                    )
+
+                    for email in emails[provider]:
+                        validated_emails[provider][email] = []
+                        while validated_emails[provider][email] == []:
+                            try:
+                                validated_emails[provider][email] = trio.run(self._validate_email,email)
+                            except Exception as e:
+                                pass
+                        bar.next()
+                    print("\tDone")
+                    
+                else:
+                    for email in emails[provider]:
+                        validated_emails[provider][email] = None
+                
+
         return validated_emails
+
+
+
+
+
+
+
 
     def generate(self,usernames: list):
         """Generate emails from a list of usernames
@@ -150,4 +176,8 @@ class EmailGenerator():
     @property
     def providers(self):
         return self.__providers
-    
+
+    @property
+    def validators(self):
+        return self.__validators
+        

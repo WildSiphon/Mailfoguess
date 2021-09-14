@@ -2,7 +2,7 @@ import os
 import json
 import argparse
 from modules.user import User
-from modules.username_generator import UsernameGenerator
+from modules.localpart_generator import LocalPartGenerator
 from modules.email_generator import EmailGenerator
 
 NB_PRINT_USERNAME = 100
@@ -15,7 +15,7 @@ def printBanner():
 def main(args):
     printBanner()
 
-    if (args.firstname+args.middlename+args.lastname+args.username) == "":
+    if args.firstname and args.middlename and args.lastname and args.username:
         print("\nPlease provide indications to generate potentials emails (leave empty for \"None\")")
         firstname  = input("\nFirstname ?\n> ")
         middlename = input("\nMiddlename ?\n> ")
@@ -38,17 +38,17 @@ def main(args):
         number     = number,
     )
 
-    username_generator = UsernameGenerator(level=args.level)
-    email_generator    = EmailGenerator()
+    localpart_generator = LocalPartGenerator(level=args.level)
+    email_generator     = EmailGenerator()
     
     print("\n================================ USER ================================")
     user.print()
         
-    usernames = username_generator.generate(user)
+    usernames = localpart_generator.generate(user)
     print("\n============================= LOCAL-PART =============================")
     print(f"Number    : {len(usernames)} generated")
-    print(f"Generating level : {username_generator.level}")
-    print(f"Using separators : {username_generator.separators}")
+    print(f"Generating level : {localpart_generator.level}")
+    print(f"Using separators : {localpart_generator.separators}")
     # print("Usernames",end=" ")
     # print(
     #     f'(only the first {NB_PRINT_USERNAME}) ' if len(usernames)>NB_PRINT_USERNAME else '',
@@ -62,7 +62,7 @@ def main(args):
     print(f"Emails       : {sum(len(domain) for domain in emails)} generated (with {len(email_generator.providers)} different domains)")
     print(f"Domains used :")
     for provider in email_generator.providers:
-        print(f" {provider} \t: {len(emails[provider])}")
+        print(f" {provider}\t: {len(emails[provider])}")
     # print(
     #     f"Emails (only the first {NB_PRINT_EMAIL})" if len(usernames)>NB_PRINT_EMAIL else "Emails",
     #     end=" : "
@@ -70,17 +70,26 @@ def main(args):
     # printable_emails = [email for email in emails[provider] for provider in emails][:NB_PRINT_EMAIL]
     # print(*printable_emails,sep=", ",end=" [...]\n" if len(emails)>NB_PRINT_EMAIL else '\n')
 
-    print("\n\t#~~~~~~~~~~~~~~~~~~~~ VALIDATION ~~~~~~~~~~~~~~~~~~~~#")
-    for provider in email_generator.providers:
-        if args.validate_all: answer = "y"
-        else:
-            answer = input(f"\n\t Would you like to verify {provider} ({len(emails[provider])}) [N/y] ")
-        
-        if answer in ["y","Y","yes","Yes","yEs","yeS","YEs","YeS","yES","YES"]:
-            emails[provider] = email_generator.validate(emails[provider],provider=provider)
+    print("\n#~~~~~~~~~~~~~~~~~~~~ VALIDATION ~~~~~~~~~~~~~~~~~~~~#")
+    emails = email_generator.validate(emails=emails,validate_all=args.validate_all)
 
-    print("\n\t#~~~~~~~~~~~~~~~~~~~~~ RESULTS ~~~~~~~~~~~~~~~~~~~~~~#")
-    print(*emails,sep=", ")
+    print("\n#~~~~~~~~~~~~~~~~~~~~~ RESULTS ~~~~~~~~~~~~~~~~~~~~~~#")
+    verified, unverified, inexistent, nb_emails = 0,0,0,0
+    for provider in emails:
+        for email in emails[provider]:
+            if emails[provider][email] == None: unverified += 1
+            elif emails[provider][email]: verified += 1
+            else: inexistent += 1
+        nb_emails += 1
+    print(f"{verified} verified adress in total on {nb_emails}")
+    print(f"{unverified} are unverified and {inexistent} doesn\'t exist")
+    if verified:
+        print("By provider :")
+        for provider in emails:
+            nb_verified_emails = len([email for email in emails[provider] if emails[provider][email]])
+            if nb_verified_emails:
+                print(f" {provider}\t: {nb_verified_emails} verified adress found!")
+
 
     output = {
         "firstname"   : user.firstname,
@@ -109,7 +118,7 @@ if __name__ == "__main__":
         dest="firstname",
         type=str,
         nargs="?",
-        default="",
+        default=None,
         required=False,
         help="set target\'s firstname",
     )
@@ -118,7 +127,7 @@ if __name__ == "__main__":
         dest="middlename",
         type=str,
         nargs="?",
-        default="",
+        default=None,
         required=False,
         help="set target\'s middlename",
     )
@@ -127,7 +136,7 @@ if __name__ == "__main__":
         dest="lastname",
         type=str,
         nargs="?",
-        default="",
+        default=None,
         required=False,
         help="set target\'s lastname",
     )
@@ -136,7 +145,7 @@ if __name__ == "__main__":
         dest="username",
         type=str,
         nargs="?",
-        default="",
+        default=None,
         required=False,
         help="set target\'s username",
     )
@@ -159,20 +168,20 @@ if __name__ == "__main__":
         help="choose output location (default is \"./output/\")",
     )
     parser.add_argument(
+        "-Y","--yes",
+        dest="validate_all",
+        action="store_true",
+        default=False,
+        required=False,
+        help="assumes \"yes\" as the answer to all questions of validation",
+    )
+    parser.add_argument(
         "--level",
         dest="level",
         choices=["min","low","high","max"],
         default="min",
         required=False,
         help="choose level of generation (default \'min\')",
-    )
-    parser.add_argument(
-        "--all",
-        dest="validate_all",
-        action="store_true",
-        default=False,
-        required=False,
-        help="validate directly without asking the emails generated",
     )
 
     main(parser.parse_args())
