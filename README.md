@@ -28,7 +28,7 @@ pip3 install -r requirements.txt
 
 ### Usual use
 
-```
+```bash
 usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [-o [OUTPUT_LOCATION]] [-Y] [--level {min,low,high,max}]
 
 python script to guess the potentials email adress of someone
@@ -51,7 +51,7 @@ optional arguments:
 + Classic use in command line in "no interactions" mod :
 
 ```bash
-$ python3 mailfoguess.py -f P* -l C* --yes
+~$ python3 mailfoguess.py -f P* -l C* --yes
 ```
 ​	Print in console :
 
@@ -128,7 +128,7 @@ Number ?
 ~$ python3 mailfoguess.py -f Bill -m "The Gater" -l Gates -u billythekid -n 1955 --level max --yes
 ```
 
-​	We strongly recommend that you **do not** do this as the script could last a long time. I tried this one for fun and it's still running (almost 10 000 email address were generated)…
+​	We strongly recommend that you **do not** do this as the script could last a long time. I tried this one for fun and it took me almost 6 hours to verify 10 000 email address generated from 2300 local-part. 
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4da.png" alt="books" style="zoom:33%;" />Output
 
