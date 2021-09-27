@@ -52,15 +52,15 @@ class User():
     def print(self):
         """Print user's informations"""
         if self._firstname:
-            print(f"Firstname  : {self._firstname}") 
+            print(f"Firstname : {self._firstname}") 
         if self._middlename:
-            print(f"Middlename : {self._middlename}") 
+            print(f"Middlename: {self._middlename}") 
         if self._lastname:
-            print(f"Lastname   : {self._lastname}") 
+            print(f"Lastname  : {self._lastname}") 
         if self._username:
-            print(f"Username   : {self._username}")
+            print(f"Username  : {self._username}")
         if self._number:
-            print(f"Number     : {' and '.join(self._number[::-1])}")
+            print(f"Number    : {' and '.join(self._number[::-1])}")
 
     @property
     def firstname(self):

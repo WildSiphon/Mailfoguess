@@ -138,6 +138,7 @@ class EmailGenerator():
                             try:
                                 validated_emails[provider][email] = trio.run(self._validate_email,email)
                             except Exception as e:
+                                print(e)
                                 pass
                         bar.next()
                     print("\tDone")

@@ -95,20 +95,25 @@ class LocalPartGenerator():
         # Name is in one word
         else: names.append(name)
 
-        # Name is a lastname
+        # Case where name is a lastname
         if last and self.__level >= 1: # Level 1 of generation
             for n in names:
-                withoutVowels = n
-                for v in vowels:
-                    if v in withoutVowels:
-                        withoutVowels = withoutVowels.replace(v,"")
-                if self.__level >= 2:  # Level 2 of generation
-                    if withoutVowels not in names:
-                        names.append(withoutVowels)
-                # Suppressing doubled consonants
-                withoutVowels = "".join(list(dict.fromkeys(withoutVowels)))
-                if withoutVowels not in names:
-                    names.append(withoutVowels)
+                if n != "":
+                    without_vowels = n
+                    for v in vowels:
+                        if v in without_vowels:
+                            without_vowels = without_vowels.replace(v,"")
+                    if self.__level >= 2:  # Level 2 of generation
+                        if without_vowels not in names:
+                            names.append(without_vowels)
+                    # Suppressing consecutive consonants
+                    unique_consec_cons = without_vowels[0]
+                    unique_consec_cons += ''.join(
+                        [without_vowels[i] for i in range(1,len(without_vowels))
+                        if without_vowels[i]!=without_vowels[i-1]]
+                    )
+                    if unique_consec_cons not in names:
+                        names.append(unique_consec_cons)
 
         return names
 
