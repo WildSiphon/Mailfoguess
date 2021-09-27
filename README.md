@@ -1,5 +1,3 @@
-# **OSINT TOOL UNDER DEVELOPMENT, COME BACK LATER**
-
 # [Mailfoguess](https://github.com/WildSiphon/Mailfoguess)
 
 **OSINT tool** to **guess** and **verify** the **email address of a person** from  information such as firstname, middlename, lastname, username...    
@@ -104,7 +102,7 @@ Generating email address is very fast but the verification part can last a long 
 ~$ python3 mailfoguess.py -f Bill -m "The Gater" -l Gates -u billythekid -n 1955 --level max --yes
 ```
 
- <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4da.png" alt="books" style="zoom:33%;" />Output
+## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4da.png" alt="books" style="zoom:33%;" />Output
 
 Results are displayed in console, but everything is recorded and stored by default in `./output/` in a `json` file.
 
@@ -209,9 +207,11 @@ Results are displayed in console, but everything is recorded and stored by defau
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f39a.png" alt="level_slider" style="zoom:33%;" />Generation level
 
+*Each level includes the previous ones.* 
+
 ### Processing each part
 
-Creating lists of names to use based on given names :
+Creating lists of names based on given informations:
 
 | Level       | Consequences                                                 |
 | ----------- | ------------------------------------------------------------ |
@@ -222,15 +222,14 @@ Creating lists of names to use based on given names :
 
 ### Generating local-part
 
+| Minimal                                                      | Low                                                          | High                                                         | Maximal                                                      |
+| :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| user<br/><br/>first<br/>first ° last<br/>first ° lini<br/>first ° middle ° last<br/>first ° middle ° lini<br/>fini  ° last<br/>fini  ° middle ° last<br/><br/>last | first  ° middle<br/>first  ° mini <br/>fini   ° middle<br/><br/>middle<br/>middle ° last<br/>middle ° lini<br/><br/>last ° first<br/>last ° fini<br/>last ° middle<br/>last ° first ° middle<br/>last ° fini  ° middle<br/>lini  ° first ° middle<br/>lini  ° first<br/>lini  ° middle | first ° last ° middle<br/>first ° last ° mini <br/>first ° lini  ° middle<br/><br/>middle ° first<br/>middle ° fini<br/>mini     ° first<br/>mini     ° last<br/><br/>last   ° mini<br/>last   ° middle ° first<br/>last   ° mini     ° first<br/>lini    ° middle ° first | first  ° mini ° last<br/><br/>middle ° first ° last<br/>middle ° last  ° first<br/>middle ° first ° lini<br/>middle ° lini   ° first<br/>mini     ° first ° last<br/>mini     ° last  ° first<br/><br/>last ° first ° mini |
+
 + **{first,middle,last,user}** represents **{firstname,middlename,lastname,username}**
 + **{f,m,l}ini** represents the initials of **f**irstname, **m**iddlename or **l**astname
   + If the name is composed, the initials are the concatenation of all initials' part
 + **°** represent a **separator** (by default they are `'', '-', '.', '_'`)
-
-| Level       | Consequences                                                 | Level       | Consequences                                                 |
-| ----------- | ------------------------------------------------------------ | ----------- | ------------------------------------------------------------ |
-| **Minimal** | user<br><br>first<br>first ° last<br>first ° lini<br>first ° middle ° last<br>first ° middle ° lini<br>fini  ° last<br>fini  ° middle ° last<br><br>last | **Low**     | first  ° middle<br/>first  ° mini <br/>fini   ° middle<br/><br/>middle<br/>middle ° last<br/>middle ° lini<br/><br/>last ° first<br/>last ° fini<br/>last ° middle<br/>last ° first ° middle<br/>last ° fini  ° middle<br/>lini  ° first ° middle<br/>lini  ° first<br/>lini  ° middle |
-| **High**    | first ° last ° middle<br>first ° last ° mini <br>first ° lini  ° middle<br><br>middle ° first<br>middle ° fini<br>mini     ° first<br>mini     ° last<br><br>last   ° mini<br>last   ° middle ° first<br>last   ° mini     ° first<br>lini    ° middle ° first | **Maximal** | first  ° mini ° last<br/><br/>middle ° first ° last<br/>middle ° last  ° first<br/>middle ° first ° lini<br/>middle ° lini   ° first<br/>mini     ° first ° last<br/>mini     ° last  ° first<br/><br/>last ° first ° mini |
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png" alt="memo" style="zoom:33%;" /> Stuff to add
 
