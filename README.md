@@ -28,70 +28,63 @@ pip3 install -r requirements.txt
 
 ### Usual use
 
-```bash
-usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [-o [OUTPUT_LOCATION]] [-Y] [--level {min,low,high,max}]
+```
+usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [--level {min,low,high,max}] [--print] [--nb-localparts [NB_PRINT_LOCALPARTS]]
+                      [--nb-emails [NB_PRINT_EMAILS]] [--nb-verified [NB_PRINT_VERIFIED]] [--output [OUTPUT_LOCATION]] [-Y]
 
 python script to guess the potentials email adress of someone
 
 optional arguments:
   -h, --help            show this help message and exit
+  -Y, --yes             assumes "yes" as the answer to all questions of validation
+
+Target:
+  Set known parameters concerning the target
+
   -f [FIRSTNAME]        set target's firstname
   -m [MIDDLENAME]       set target's middlename
   -l [LASTNAME]         set target's lastname
   -u [USERNAME]         set target's username
   -n [NUMBER]           set a number to use (year of birth, locality...)
-  -o [OUTPUT_LOCATION]  choose output location (default is "./output/")
-  -Y, --yes             assumes "yes" as the answer to all questions of validation
+
+Generation:
+  Set parameters concerning the generation
+
   --level {min,low,high,max}
                         choose level of generation (default 'min')
+
+Output:
+  Select how the data will be displayed and/or saved
+
+  --print               print generated informations on screen (local-part, emails and verified emails)
+  --nb-localparts [NB_PRINT_LOCALPARTS]
+                        set the maximum of local-part printed when informations are displayed (default is 20)
+  --nb-emails [NB_PRINT_EMAILS]
+                        set the maximum of emails printed per domain when informations are displayed (default is 4)
+  --nb-verified [NB_PRINT_VERIFIED]
+                        set the maximum of verified emails printed per domain when informations are displayed (default is all)
+  --output [OUTPUT_LOCATION]
+                        choose output location (default is "./output/")
+
 ```
 
-**Examples**
+### No interactions mod
 
-+ Classic use in command line in "no interactions" mod :
+You enter the *No interactions mod* when you specify the parameters in the command line.
+
+**EXAMPLE :**
 
 ```bash
-~$ python3 mailfoguess.py -f P* -l C* --yes
-```
-​	Print in console :
-
-```
-[banner]
-
-================================ USER ================================
-Firstname  : p*
-Lastname   : c*
-
-============================= LOCAL-PART =============================
-Number    : 14 generated
-Generating level : Minimal
-Using separators : ['', '-', '.', '_']
-
-================================ EMAILS ==============================
-Emails       : 57 generated (with 5 different domains)
-Domains used :
- gmail.com	: 7
- yahoo.com	: 11
- yahoo.fr	: 11
- laposte.net	: 14
- protonmail.com	: 14
-
-#~~~~~~~~~~~~~~~~~~~~ VALIDATION ~~~~~~~~~~~~~~~~~~~~#
-> Processing gmail.com (7)...	 |################################| 100.0% - 0s	Done
-> Processing yahoo.com (11)...	 |################################| 100.0% - 0s	Done
-> Processing yahoo.fr (11)...	 |################################| 100.0% - 0s	Done
-> Processing laposte.net (14)...	 |################################| 100.0% - 0s	Done
-> Processing protonmail.com (14)...	 |################################| 100.0% - 0s	Done
-
-#~~~~~~~~~~~~~~~~~~~~~ RESULTS ~~~~~~~~~~~~~~~~~~~~~~#
-14 verified adress in total on 57
-0 are unverified and 43 doesn't exist
-By provider :
- gmail.com	: 6 verified adress found!
- protonmail.com	: 8 verified adress found!
+~$ python3 mailfoguess.py -f Pierre -l Croce --print --yes
 ```
 
-+ Use in interactions mod (no indications provided to generate potentials emails) :
+![demo](assets/demo.gif)
+
+### Interactions mod
+
+You enter *Interactions mod* when no indication is provided to generate potentials emails.
+
+**EXAMPLE**
 
 ```bash
 $ python3 mailfoguess.py
@@ -99,135 +92,116 @@ $ python3 mailfoguess.py --level high
 $ python3 mailfoguess.py --yes
 ```
 
-​	If so, you will be ask about that :
+![interactions_mod](assets/interactions_mod.png)
 
-```
-[banner]
+You will get the same result after this part.
 
-Please provide indications to generate potentials emails (leave empty for "None")
+### Caution
 
-Firstname ?
-> P*
-
-Middlename ?
-> 
-
-Lastname ?
-> C*
-
-Username ?
-> 
-
-Number ?
-> 
-```
-
-+ To generate and verify the maximum about one person without any interactions. 
+Generating email address is very fast but the verification part can last a long time. For example the command below, (the worst realistic case I could imagine), took me almost 6 hours to verify the 10 000 email address generated from 2300 local-part.
 
 ```bash
 ~$ python3 mailfoguess.py -f Bill -m "The Gater" -l Gates -u billythekid -n 1955 --level max --yes
 ```
 
-​	We strongly recommend that you **do not** do this as the script could last a long time. I tried this one for fun and it took me almost 6 hours to verify 10 000 email address generated from 2300 local-part. 
+ <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4da.png" alt="books" style="zoom:33%;" />Output
 
-## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4da.png" alt="books" style="zoom:33%;" />Output
-
-Results are displayed in console, but all the informations are recorded and stored by default in `./output/` in a `json` file. This is much more than just what is printed on the terminal.
+Results are displayed in console, but everything is recorded and stored by default in `./output/` in a `json` file.
 
 ### Example
 
-`p*c*.json`
+`pierrecroce.json`
 
 ```json
 {
-  "firstname": "p*",
+  "firstname": "pierre",
   "middlename": null,
-  "lastname": "c*",
+  "lastname": "croce",
   "username": null,
   "number": null,
   "local-parts": [
-    "c*",
-    "p-c*",
-    "p.c*",
-    "p_c*",
-    "pc*",
-    "p*",
-    "p*-c",
-    "p*-c*",
-    "p*.c",
-    "p*.c*",
-    "p*_c",
-    "p*_c*",
-    "p*c",
-    "p*c*"
+    "croce",
+    "p-croce",
+    "p.croce",
+    "p_croce",
+    "pcroce",
+    "pierre",
+    "pierre-c",
+    "pierre-croce",
+    "pierre.c",
+    "pierre.croce",
+    "pierre_c",
+    "pierre_croce",
+    "pierrec",
+    "pierrecroce"
   ],
   "emails": {
     "gmail.com": {
-      "p.c*@gmail.com": true,
-      "pc*@gmail.com": true,
-      "p*@gmail.com": false,
-      "p*.c@gmail.com": true,
-      "p*.c*@gmail.com": true,
-      "p*c@gmail.com": true,
-      "p*c*@gmail.com": true
+      "p.croce@gmail.com": true,
+      "pcroce@gmail.com": true,
+      "pierre@gmail.com": false,
+      "pierre.c@gmail.com": true,
+      "pierre.croce@gmail.com": true,
+      "pierrec@gmail.com": true,
+      "pierrecroce@gmail.com": true
     },
     "yahoo.com": {
-      "c*@yahoo.com": false,
-      "p.c*@yahoo.com": false,
-      "p_c*@yahoo.com": false,
-      "pc*@yahoo.com": false,
-      "p*@yahoo.com": false,
-      "p*.c@yahoo.com": false,
-      "p*.c*@yahoo.com": false,
-      "p*_c@yahoo.com": false,
-      "p*_c*@yahoo.com": false,
-      "p*c@yahoo.com": false,
-      "p*c*@yahoo.com": false
+      "croce@yahoo.com": false,
+      "p.croce@yahoo.com": false,
+      "p_croce@yahoo.com": false,
+      "pcroce@yahoo.com": false,
+      "pierre@yahoo.com": false,
+      "pierre.c@yahoo.com": false,
+      "pierre.croce@yahoo.com": false,
+      "pierre_c@yahoo.com": false,
+      "pierre_croce@yahoo.com": false,
+      "pierrec@yahoo.com": false,
+      "pierrecroce@yahoo.com": false
     },
     "yahoo.fr": {
-      "c*@yahoo.fr": false,
-      "p.c*@yahoo.fr": false,
-      "p_c*@yahoo.fr": false,
-      "pc*@yahoo.fr": false,
-      "p*@yahoo.fr": false,
-      "p*.c@yahoo.fr": false,
-      "p*.c*@yahoo.fr": false,
-      "p*_c@yahoo.fr": false,
-      "p*_c*@yahoo.fr": false,
-      "p*c@yahoo.fr": false,
-      "p*c*@yahoo.fr": false
+      "croce@yahoo.fr": false,
+      "p.croce@yahoo.fr": false,
+      "p_croce@yahoo.fr": false,
+      "pcroce@yahoo.fr": false,
+      "pierre@yahoo.fr": false,
+      "pierre.c@yahoo.fr": false,
+      "pierre.croce@yahoo.fr": false,
+      "pierre_c@yahoo.fr": false,
+      "pierre_croce@yahoo.fr": false,
+      "pierrec@yahoo.fr": false,
+      "pierrecroce@yahoo.fr": false
     },
     "laposte.net": {
-      "c*@laposte.net": false,
-      "p-c*@laposte.net": false,
-      "p.c*@laposte.net": false,
-      "p_c*@laposte.net": false,
-      "pc*@laposte.net": false,
-      "p*@laposte.net": false,
-      "p*-c@laposte.net": false,
-      "p*-c*@laposte.net": false,
-      "p*.c@laposte.net": false,
-      "p*.c*@laposte.net": false,
-      "p*_c@laposte.net": false,
-      "p*_c*@laposte.net": false,
-      "p*c@laposte.net": false,
-      "p*c*@laposte.net": false
+      "croce@laposte.net": false,
+      "p-croce@laposte.net": false,
+      "p.croce@laposte.net": false,
+      "p_croce@laposte.net": false,
+      "pcroce@laposte.net": false,
+      "pierre@laposte.net": false,
+      "pierre-c@laposte.net": false,
+      "pierre-croce@laposte.net": false,
+      "pierre.c@laposte.net": false,
+      "pierre.croce@laposte.net": false,
+      "pierre_c@laposte.net": false,
+      "pierre_croce@laposte.net": false,
+      "pierrec@laposte.net": false,
+      "pierrecroce@laposte.net": false
     },
     "protonmail.com": {
-      "c*@protonmail.com": false,
-      "p-c*@protonmail.com": true,
-      "p.c*@protonmail.com": true,
-      "p_c*@protonmail.com": true,
-      "pc*@protonmail.com": false,
-      "p*@protonmail.com": false,
-      "p*-c@protonmail.com": true,
-      "p*-c*@protonmail.com": true,
-      "p*.c@protonmail.com": true,
-      "p*.c*@protonmail.com": false,
-      "p*_c@protonmail.com": true,
-      "p*_c*@protonmail.com": false,
-      "p*c@protonmail.com": false,
-      "p*c*@protonmail.com": true
+      "croce@protonmail.com": true,
+      "p-croce@protonmail.com": true,
+      "p.croce@protonmail.com": true,
+      "p_croce@protonmail.com": true,
+      "pcroce@protonmail.com": true,
+      "pierre@protonmail.com": true,
+      "pierre-c@protonmail.com": true,
+      "pierre-croce@protonmail.com": true,
+      "pierre.c@protonmail.com": true,
+      "pierre.croce@protonmail.com": true,
+      "pierre_c@protonmail.com": true,
+      "pierre_croce@protonmail.com": true,
+      "pierrec@protonmail.com": true,
+      "pierrecroce@protonmail.com": true
     }
   }
 }
@@ -241,9 +215,9 @@ Creating lists of names to use based on given names :
 
 | Level       | Consequences                                                 |
 | ----------- | ------------------------------------------------------------ |
-| **Minimal** | Add an empty name<br><br>If {first,middle,last,user}**name is composed** (ex : Jean-Michel) :<br>   - add each part of the name separatly (ex : ["jean","michel"])<br>   - add the all name separated by each separator (ex : ["jeanmichel","jean-michel"…])<br>   + skipping particles (2 letters word) in all the names except in usernames<br><br>If **name is not composed** :<br>   - add name |
-| **Low**     | Add the vowelless lastname where all consonants are unique   |
-| **High**    | Add the vowelless lastname where all double consonants are kept |
+| **Minimal** | Process with an *empty name*<br><br>**If name is not composed**:<br>   - Process with *the name*<br><br>**If name is composed**:<br>   - Process with *each part of the name separately*<br>       + Skipping *particles* (2 letters word) in all the names except in usernames<br>   - Process with *the all name separated by each separator*<br><br>Example:<br>   Jean-Michel -> `"", jean, michel, jean-michel, jean.michel, jean_michel, jeanmichel`<br>   de Bauvoir   -> `"", bauvoir, de-bauvoir, de.bauvoir, de_bauvoir, debauvoir` |
+| **Low**     | Process with the *vowelless lastname where all consecutives consonants are unique*<br><br>Example:<br>   Cadillac -> `cdlc` |
+| **High**    | Process with the *vowelless lastname*<br/><br/>Example:<br/>   Cadillac -> `cdllc` |
 | **Maximal** |                                                              |
 
 ### Generating local-part
@@ -251,14 +225,12 @@ Creating lists of names to use based on given names :
 + **{first,middle,last,user}** represents **{firstname,middlename,lastname,username}**
 + **{f,m,l}ini** represents the initials of **f**irstname, **m**iddlename or **l**astname
   + If the name is composed, the initials are the concatenation of all initials' part
-+ **°** represent a **separator**
++ **°** represent a **separator** (by default they are `'', '-', '.', '_'`)
 
-| Level       | Consequences                                                 |
-| ----------- | ------------------------------------------------------------ |
-| **Minimal** | user<br><br>first<br>first ° last<br>first ° lini<br>first ° middle ° last<br>first ° middle ° lini<br>fini  ° last<br>fini  ° middle ° last<br><br>last |
-| **Low**     | first  ° middle<br>first  ° mini <br>fini   ° middle<br><br>middle<br>middle ° last<br>middle ° lini<br><br>last ° first<br>last ° fini<br>last ° middle<br>last ° first ° middle<br>last ° fini  ° middle<br>lini  ° first ° middle<br>lini  ° first<br>lini  ° middle |
-| **High**    | first ° last ° middle<br>first ° last ° mini <br>first ° lini  ° middle<br><br>middle ° first<br>middle ° fini<br>mini     ° first<br>mini     ° last<br><br>last   ° mini<br>last   ° middle ° first<br>last   ° mini     ° first<br>lini    ° middle ° first |
-| **Maximal** | first  ° mini ° last<br><br>middle ° first ° last<br>middle ° last  ° first<br>middle ° first ° lini<br>middle ° lini   ° first<br>mini     ° first ° last<br>mini     ° last  ° first<br><br>last ° first ° mini |
+| Level       | Consequences                                                 | Level       | Consequences                                                 |
+| ----------- | ------------------------------------------------------------ | ----------- | ------------------------------------------------------------ |
+| **Minimal** | user<br><br>first<br>first ° last<br>first ° lini<br>first ° middle ° last<br>first ° middle ° lini<br>fini  ° last<br>fini  ° middle ° last<br><br>last | **Low**     | first  ° middle<br/>first  ° mini <br/>fini   ° middle<br/><br/>middle<br/>middle ° last<br/>middle ° lini<br/><br/>last ° first<br/>last ° fini<br/>last ° middle<br/>last ° first ° middle<br/>last ° fini  ° middle<br/>lini  ° first ° middle<br/>lini  ° first<br/>lini  ° middle |
+| **High**    | first ° last ° middle<br>first ° last ° mini <br>first ° lini  ° middle<br><br>middle ° first<br>middle ° fini<br>mini     ° first<br>mini     ° last<br><br>last   ° mini<br>last   ° middle ° first<br>last   ° mini     ° first<br>lini    ° middle ° first | **Maximal** | first  ° mini ° last<br/><br/>middle ° first ° last<br/>middle ° last  ° first<br/>middle ° first ° lini<br/>middle ° lini   ° first<br/>mini     ° first ° last<br/>mini     ° last  ° first<br/><br/>last ° first ° mini |
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png" alt="memo" style="zoom:33%;" /> Stuff to add
 
@@ -267,6 +239,7 @@ Creating lists of names to use based on given names :
 + ~~Verification on email~~
 + Add options in command line to change separators and choose providers to use
 + Option to choose a country to define the list of domains
++ Possibility to stop and resume the validation of addresses
 
 ## References
 
