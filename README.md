@@ -10,7 +10,7 @@ An email address is made up from **local-part**, the symbol **@**, and a **domai
 
 - **Create *a lot* of possible local-part** from informations given and following generation level 
 - **Add @domain to all local-part** respecting the conditions of creation of mail of these domains
-- **Verify these mails** (only for ["gmail","google","laposte","protonmail","yahoo"])
+- **Verify these mails** (only for "gmail","laposte","protonmail","yahoo")
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" alt="hammer_and_wrench" style="zoom:33%;" /> Installation
 
@@ -27,14 +27,13 @@ pip3 install -r requirements.txt
 ### Usual use
 
 ```
-usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [--level {min,low,high,max}] [--print] [--nb-localparts [NB_PRINT_LOCALPARTS]]
-                      [--nb-emails [NB_PRINT_EMAILS]] [--nb-verified [NB_PRINT_VERIFIED]] [--output [OUTPUT_LOCATION]] [-Y]
+usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [--yes] [--level {min,low,high,max}] [--resume [RESUME_PATH]] [--print] [--output [OUTPUT_LOCATION]]
+                      [--nb-localparts [NB_PRINT_LOCALPARTS]] [--nb-emails [NB_PRINT_EMAILS]] [--nb-verified [NB_PRINT_VERIFIED]]
 
 python script to guess the potentials email adress of someone
 
 optional arguments:
   -h, --help            show this help message and exit
-  -Y, --yes             assumes "yes" as the answer to all questions of validation
 
 Target:
   Set known parameters concerning the target
@@ -48,29 +47,31 @@ Target:
 Generation:
   Set parameters concerning the generation
 
-  --level {min,low,high,max}
+  --yes, -Y             assumes "yes" as the answer to all questions of validation
+  --level {min,low,high,max}, -L {min,low,high,max}
                         choose level of generation (default 'min')
+  --resume [RESUME_PATH], -r [RESUME_PATH]
+                        select a json file to enrich or resume
 
 Output:
   Select how the data will be displayed and/or saved
 
-  --print               print generated informations on screen (local-part, emails and verified emails)
+  --print, -P           print generated informations on screen (local-part, emails and verified emails)
+  --output [OUTPUT_LOCATION], -O [OUTPUT_LOCATION]
+                        choose output location (default is "./output")
   --nb-localparts [NB_PRINT_LOCALPARTS]
                         set the maximum of local-part printed when informations are displayed (default is 20)
   --nb-emails [NB_PRINT_EMAILS]
                         set the maximum of emails printed per domain when informations are displayed (default is 4)
   --nb-verified [NB_PRINT_VERIFIED]
                         set the maximum of verified emails printed per domain when informations are displayed (default is all)
-  --output [OUTPUT_LOCATION]
-                        choose output location (default is "./output/")
-
 ```
 
 ### No interactions mod
 
 You enter the *No interactions mod* when you specify the parameters in the command line.
 
-**EXAMPLE :**
+#### EXAMPLE
 
 ```bash
 ~$ python3 mailfoguess.py -f Pierre -l Croce --print --yes
@@ -80,9 +81,9 @@ You enter the *No interactions mod* when you specify the parameters in the comma
 
 ### Interactions mod
 
-You enter *Interactions mod* when no indication is provided to generate potentials emails.
+You enter *Interactions mod* when no indication are provided to generate potentials emails.
 
-**EXAMPLE**
+#### EXAMPLE
 
 ```bash
 $ python3 mailfoguess.py
@@ -96,11 +97,13 @@ You will get the same result after this part.
 
 ### Caution
 
-Generating email address is very fast but the verification part can last a long time. For example the command below, (the worst realistic case I could imagine), took me almost 6 hours to verify the 10 000 email address generated from 2300 local-part.
+Generating email address is very fast but the verification part can last a long time. For example the command below, (a very bad realistic test case), took me almost 6 hours to verify the 10 000 email address generated from 2300 local-part.
 
 ```bash
 ~$ python3 mailfoguess.py -f Bill -m "The Gater" -l Gates -u billythekid -n 1955 --level max --yes
 ```
+
+If the verification is to long for you, you can at any time press `[ctrl+c]` to stop the script. This will save all the data so you can resume the verification using the `–resume` or `-r` options.
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4da.png" alt="books" style="zoom:33%;" />Output
 
@@ -226,8 +229,8 @@ Creating lists of names based on given informations:
 | :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | user<br/><br/>first<br/>first ° last<br/>first ° lini<br/>first ° middle ° last<br/>first ° middle ° lini<br/>fini  ° last<br/>fini  ° middle ° last<br/><br/>last | first  ° middle<br/>first  ° mini <br/>fini   ° middle<br/><br/>middle<br/>middle ° last<br/>middle ° lini<br/><br/>last ° first<br/>last ° fini<br/>last ° middle<br/>last ° first ° middle<br/>last ° fini  ° middle<br/>lini  ° first ° middle<br/>lini  ° first<br/>lini  ° middle | first ° last ° middle<br/>first ° last ° mini <br/>first ° lini  ° middle<br/><br/>middle ° first<br/>middle ° fini<br/>mini     ° first<br/>mini     ° last<br/><br/>last   ° mini<br/>last   ° middle ° first<br/>last   ° mini     ° first<br/>lini    ° middle ° first | first  ° mini ° last<br/><br/>middle ° first ° last<br/>middle ° last  ° first<br/>middle ° first ° lini<br/>middle ° lini   ° first<br/>mini     ° first ° last<br/>mini     ° last  ° first<br/><br/>last ° first ° mini |
 
-+ **{first,middle,last,user}** represents **{firstname,middlename,lastname,username}**
-+ **{f,m,l}ini** represents the initials of **f**irstname, **m**iddlename or **l**astname
++ **first,middle,last,user** represents **firstname,middlename,lastname,username**
++ **fini,mini,lini** represents the initials of **f**irstname, **m**iddlename or **l**astname
   + If the name is composed, the initials are the concatenation of all initials' part
 + **°** represent a **separator** (by default they are `'', '-', '.', '_'`)
 
@@ -236,9 +239,10 @@ Creating lists of names based on given informations:
 + Colors in the printed output (feel free to help me with that)
 + ~~Creation of email~~
 + ~~Verification on email~~
-+ Add options in command line to change separators and choose providers to use
++ Add options to change separators 
++ Add options to choose providers to use
 + Option to choose a country to define the list of domains
-+ Possibility to stop and resume the validation of addresses
++ ~~Possibility to stop and resume the script~~
 
 ## References
 
