@@ -1,6 +1,7 @@
 import os
-import trio
+import re
 import json
+import trio
 
 from progress.bar import Bar
 
@@ -18,6 +19,8 @@ class Guesser():
     :type level: str
     """
 
+    REGEX = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
     def __init__(self,user: User,level="min"):
         """The constructor"""
 
@@ -34,17 +37,19 @@ class Guesser():
     def validate(self,validate_all=False):
         """Validate the existence of emails by domain
 
-        :param validate_all: flag to validate evrything wihtout asking th user
+        :param validate_all: flag to validate everything wiyhout asking the user
         :type validate_all: bool
         """
         for provider in self._emails:
-            self._validated_emails[provider] = {}
+            if provider not in self._validated_emails:
+                self._validated_emails[provider] = {}
 
             if provider.split(".")[0] not in self._email_generator.validators:
                 print(f"Can't verify {provider.split('.')[0]}\'s mails validity")
                 for email in self._emails[provider]:
-                    self._validated_emails[provider][email] = None
-
+                    if email not in self._validated_emails[provider]:
+                        self._validated_emails[provider][email] = None
+                    else: pass
             else:
                 if validate_all: answer = "y"
                 else:
@@ -58,19 +63,23 @@ class Guesser():
                     )
 
                     for email in self._emails[provider]:
-                        self._validated_emails[provider][email] = -1
-                        while self._validated_emails[provider][email] == -1:
-                            try:
-                                self._validated_emails[provider][email] = trio.run(self._email_generator.validate_email,email)
-                            except Exception as e:
-                                print(e)
-                                pass
+
+                        if(re.fullmatch(self.REGEX,email)) and (self._validated_emails[provider][email] in [-1,None,"null"] or not email in self._validated_emails[provider]):
+                            self._validated_emails[provider][email] = -1
+                            while self._validated_emails[provider][email] == -1:
+                                try:
+                                    self._validated_emails[provider][email] = trio.run(self._email_generator.validate_email,email)
+                                except Exception as e:
+                                    print(e)
+                                    pass
                         bar.next()
                     print("\tDone")
                     
                 else:
                     for email in self._emails[provider]:
-                        self._validated_emails[provider][email] = None
+                        if email not in self._validated_emails[provider]:
+                            self._validated_emails[provider][email] = None
+                        else: pass
 
     def save(self,output_location="./output"):
         """Save data
@@ -111,20 +120,34 @@ class Guesser():
             json.dump(output,f,indent=2)
         print(f"Data successfully saved in \'{output_location}/{output_name}.json\'!")
 
+    def resume(self,data):
+        if data["localparts"]:
+            self._localparts.extend(data["localparts"])
+            self._localparts = list(dict.fromkeys(self._localparts))
+        if data["emails"]:
+            for provider in data["emails"]:
+                self._emails[provider].extend(data["emails"][provider])
+                self._emails[provider] = list(dict.fromkeys(self._emails[provider]))
+        if data["validated_emails"]:
+            self._validated_emails = data["validated_emails"]
+
     def validated_emails_stats(self):
         """To get statistics about emails verified
 
         :return: number of verified emails, unverified emails, non-existent emails and total of emails
-        :rtype: tuple of 4 variables (verified,unverified,nonexistent,nb_emails)
+        :rtype: tuple of 4 variables (nb_emails,verified,unverified,nonexistent,unprocessed)
         """
-        verified,unverified,nonexistent,nb_emails = 0,0,0,0
+        verified,unverified,nonexistent,unprocessed,nb_emails = 0,0,0,0,0
         for provider in self._validated_emails:
             for email in self._validated_emails[provider]:
-                if self._validated_emails[provider][email] == None: unverified += 1
-                elif self._validated_emails[provider][email]: verified += 1
-                else: nonexistent += 1
+                mail = self._validated_emails[provider][email]
+                if isinstance(mail,bool):
+                    if mail: verified += 1
+                    else: nonexistent += 1
+                elif mail == None: unverified += 1
+                else: unprocessed += 1
                 nb_emails += 1
-        return (verified,unverified,nonexistent,nb_emails)
+        return (nb_emails,verified,unverified,nonexistent,unprocessed)
 
     def verified_emails(self,provider):
         """To get a list of verified emails by provider
@@ -136,7 +159,7 @@ class Guesser():
         :rtype: list
         """
         return [email for email in self._validated_emails[provider] 
-                if self._validated_emails[provider][email]]
+                if self._validated_emails[provider][email] == True]
 
     @property
     def localparts(self):

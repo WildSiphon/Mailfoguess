@@ -1,10 +1,14 @@
+import os
+import json
 import argparse
+
 from modules.user import User
 from modules.guesser import Guesser
 
 def printBanner():
     for line in open("assets/banner.txt","r"):
         print(line.replace('\n',''))
+    print()
 
 def main(args):
     printBanner()
@@ -14,8 +18,27 @@ def main(args):
     nb_print_emails     = args.nb_print_emails
     nb_print_verified   = args.nb_print_verified
 
-    if not (args.firstname or args.middlename or args.lastname or args.username):
-        print("\nPlease provide indications to generate potentials emails (leave empty for \"None\")")
+    resume = None
+    if args.resume_path:
+        if os.path.isfile(args.resume_path) and args.resume_path.split(".")[-1]=="json":
+            with open(args.resume_path,"r") as f:
+                resume = json.load(f)
+            nb_emails = sum(len(resume["emails"][provider]) for provider in resume["emails"])
+            nb_validated_emails = sum(len(resume["validated_emails"][provider]) for provider in resume["validated_emails"])
+            print(f"Resuming file {args.resume_path}:\n + {nb_emails} emails already generated")
+            print(f" + {nb_validated_emails} emails already processed during validation step")
+        else:
+            print(f"File {args.resume_path} is not a json file. Verify file, spelling or extension.")
+
+
+    if resume:
+        firstname  = resume["firstname"] if resume["firstname"] else ""
+        middlename = resume["middlename"] if resume["middlename"] else ""
+        lastname   = resume["lastname"] if resume["lastname"] else ""
+        username   = resume["username"] if resume["username"] else ""
+        number     = resume["number"] if resume["number"] else ""
+    elif not (args.firstname or args.middlename or args.lastname or args.username):
+        print("Please provide indications to generate potentials emails (leave empty for \"None\")")
         firstname  = input("\nFirstname ?\n> ")
         middlename = input("\nMiddlename ?\n> ")
         lastname   = input("\nLastname ?\n> ")
@@ -41,7 +64,9 @@ def main(args):
         user  = user,
         level = args.level,
     )
-    
+
+    if resume: guesser.resume(data=resume)
+
     print("\n================================ USER ================================")
     user.print()
         
@@ -49,7 +74,7 @@ def main(args):
     print(f"Generating level: {guesser.level}")
     print(f"Using separators: {guesser.separators}")
     print(f"Number generated: {len(guesser.localparts)} generated")
-    if print_more:
+    if print_more and nb_print_localparts!=0:
         print("Local-parts",end=f" (printing only {nb_print_localparts}):\n - " if len(guesser.localparts)>nb_print_localparts else ":\n - ")
         if len(guesser.localparts)>nb_print_localparts:
             printable_localparts = guesser.localparts[:int(nb_print_localparts/2)] + ["..."] + guesser.localparts[len(guesser.localparts)-int(nb_print_localparts/2):]
@@ -61,12 +86,12 @@ def main(args):
     print(f"Emails      : {nb_emails} generated (with {len(guesser.providers)} different domains)")
     print(f"Domains used:")
     for provider in guesser.providers:
-        print(f" + {provider} ({len(guesser.emails[provider])})",end=":\n\t- " if print_more else "\n")
-        if print_more:
+        print(f" + {provider} ({len(guesser.emails[provider])})",end=":\n\t- " if print_more and nb_print_emails!=0 else "\n")
+        if print_more and nb_print_emails!=0:
             emails_from_provider = [email for email in guesser.emails[provider]]
-            if len(emails_from_provider)>nb_print_emails:
+            if len(emails_from_provider) > nb_print_emails:
                 printable_emails = emails_from_provider[:int(nb_print_emails/2)] + ["..."] + emails_from_provider[len(emails_from_provider)-int(nb_print_emails/2):]
-            else: printable_emails = emails_from_provider
+            elif nb_print_emails: printable_emails = emails_from_provider
             print(*printable_emails,sep="\n\t- ")
 
     print("\n#~~~~~~~~~~~~~~~~~~~~ VALIDATION ~~~~~~~~~~~~~~~~~~~~#")
@@ -76,18 +101,19 @@ def main(args):
         print("\n[ctrl+c] Script interrupted by user.")
     finally:
         print("\n#~~~~~~~~~~~~~~~~~~~~~ RESULTS ~~~~~~~~~~~~~~~~~~~~~~#")
-        verified,unverified,nonexistent,nb_emails = guesser.validated_emails_stats()
-        print(f"Address processed  : {nb_emails}")
-        print(f" + verified     : {verified}")
-        print(f" + unverified   : {unverified}")
-        print(f" + non-existent : {nonexistent}")
-        if verified:
-            print("\nBy provider :")
+        stats = guesser.validated_emails_stats()
+        print(f"Address processed : {stats[0]}")
+        print(f" + verified     : {stats[1]}")
+        print(f" + unverified   : {stats[2]}")
+        print(f" + non-existent : {stats[3]}")
+        print(f" + unprocessed  : {stats[4]}")
+        if stats[1]:
+            print("By provider :")
             for provider in guesser.validated_emails:
                 verified_emails = guesser.verified_emails(provider=provider)
-                if len(verified_emails):
-                    print(f" + {provider}: {len(verified_emails)} verified adress found!",end=":\n\t- " if print_more else "\n")
-                    if print_more:
+                if verified_emails:
+                    print(f" + {provider}: {len(verified_emails)} verified adress found!",end=":\n\t- " if print_more and nb_print_verified!=0 else "\n")
+                    if print_more and nb_print_verified!=0:
                         if nb_print_verified:
                             printable_verified = verified_emails[:int(nb_print_emails/2)] + ["..."] + verified_emails[len(verified_emails)-int(nb_print_emails/2):]
                         else: printable_verified = verified_emails
@@ -172,6 +198,15 @@ if __name__ == "__main__":
         default="min",
         required=False,
         help="choose level of generation (default \'min\')",
+    )
+    generation_parameters.add_argument(
+        "--resume","-r",
+        dest="resume_path",
+        type=str,
+        nargs="?",
+        default=None,
+        required=False,
+        help="select a json file to enrich or resume",
     )
 
     #~~~~~~~~~~~~~~~~~ OUTPUT PARAMETERS ~~~~~~~~~~~~~~~~~#
