@@ -1,8 +1,6 @@
 import json
 import time
-import trio,httpx
-
-from progress.bar import Bar
+import httpx
 
 from holehe.modules.mails.google import google
 from holehe.modules.mails.laposte import laposte
@@ -19,7 +17,7 @@ class EmailGenerator():
     def __init__(self,country="fr"):
         """The constructor."""
         self.__providers  = self._set_providers(country=country)
-        self.__validators = ["gmail","google","laposte","protonmail","yahoo"]
+        self.__validators = ["gmail","laposte","protonmail","yahoo"]
 
     def _set_providers(self,country):
         """Set the providers used for the generation 
@@ -57,7 +55,7 @@ class EmailGenerator():
         if 'yahoo' in domain:
             if (len(username) < 4) or (len(username) > 32):
                 return
-            if ('-' in username): # characters interdits
+            if ('-' in username):
                 return
             
         if 'outlook' in domain:
@@ -90,72 +88,29 @@ class EmailGenerator():
 
         return mail
 
-    async def _validate_email(self,email):
-        out = []
-        client = httpx.AsyncClient()
-        
-        domain = email.split("@")[-1].split(".")[0]
+    async def validate_email(self,email):
+        try:
+            out = []
+            client = httpx.AsyncClient()
+            
+            domain = email.split("@")[-1].split(".")[0]
 
-        if domain in ["gmail","google"]:
-            await google(email, client, out)
-        elif domain == "laposte":
-            await laposte(email, client, out)
-        elif domain == "protonmail":
-            await protonmail(email, client, out)
-        elif domain == "yahoo":
-            await yahoo(email, client, out)
-
-        await client.aclose()
+            if domain == "gmail":
+                await google(email, client, out)
+            elif domain == "laposte":
+                await laposte(email, client, out)
+            elif domain == "protonmail":
+                await protonmail(email, client, out)
+            elif domain == "yahoo":
+                await yahoo(email, client, out)
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
+        except Exception as e:
+            print(e)
+        finally:
+            await client.aclose()
         
         return out[0]['exists']
-
-    def validate(self,emails:dict={},validate_all=False):
-        validated_emails = {}
-
-        for provider in emails:
-            validated_emails[provider] = {}
-
-            if provider.split(".")[0] not in self.__validators:
-                print(f"Can't verify {provider.split('.')[0]}\'s mails validity")
-                for email in emails[provider]:
-                    validated_emails[provider][email] = None
-
-            else:
-                if validate_all: answer = "y"
-                else:
-                    answer = input(f"Would you like to verify {provider} ({len(emails[provider])})\t[N/y] ")
-                
-                if answer in ["y","Y","yes","Yes","yEs","yeS","YEs","YeS","yES","YES"]:
-                    bar = Bar(
-                        f"> Processing{' '+provider if provider else ''} ({len(emails[provider])})...\t",
-                        suffix='%(percent).1f%% - %(eta)ds',
-                        max=len(emails[provider])
-                    )
-
-                    for email in emails[provider]:
-                        validated_emails[provider][email] = []
-                        while validated_emails[provider][email] == []:
-                            try:
-                                validated_emails[provider][email] = trio.run(self._validate_email,email)
-                            except Exception as e:
-                                print(e)
-                                pass
-                        bar.next()
-                    print("\tDone")
-                    
-                else:
-                    for email in emails[provider]:
-                        validated_emails[provider][email] = None
-                
-
-        return validated_emails
-
-
-
-
-
-
-
 
     def generate(self,usernames: list):
         """Generate emails from a list of usernames
