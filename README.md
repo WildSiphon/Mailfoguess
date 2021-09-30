@@ -27,8 +27,8 @@ pip3 install -r requirements.txt
 ### Usual use
 
 ```
-usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [--yes] [--level {min,low,high,max}] [--resume [RESUME_PATH]] [--print] [--output [OUTPUT_LOCATION]]
-                      [--nb-localparts [NB_PRINT_LOCALPARTS]] [--nb-emails [NB_PRINT_EMAILS]] [--nb-verified [NB_PRINT_VERIFIED]]
+usage: mailfoguess.py [-h] [-f [FIRSTNAME]] [-m [MIDDLENAME]] [-l [LASTNAME]] [-u [USERNAME]] [-n [NUMBER]] [--yes] [--level {min,low,high,max}] [--resume [RESUME_PATH]] [--separators [SEPARATORS]] [--print]
+                      [--output [OUTPUT_LOCATION]] [--nb-localparts [NB_PRINT_LOCALPARTS]] [--nb-emails [NB_PRINT_EMAILS]] [--nb-verified [NB_PRINT_VERIFIED]]
 
 python script to guess the potentials email adress of someone
 
@@ -51,7 +51,9 @@ Generation:
   --level {min,low,high,max}, -L {min,low,high,max}
                         choose level of generation (default 'min')
   --resume [RESUME_PATH], -r [RESUME_PATH]
-                        select a json file to enrich or resume
+                        select a json file to resume or enrich wich new options
+  --separators [SEPARATORS], -s [SEPARATORS]
+                        set separators used for the generation of local-parts (default are '-._')
 
 Output:
   Select how the data will be displayed and/or saved

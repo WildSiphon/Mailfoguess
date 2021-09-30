@@ -21,11 +21,11 @@ class Guesser():
 
     REGEX = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-    def __init__(self,user: User,level="min"):
+    def __init__(self,user: User,level="min",separators="-._"):
         """The constructor"""
 
         # Useful generators
-        self._localpart_generator = LocalPartGenerator(level=level)
+        self._localpart_generator = LocalPartGenerator(level=level,separators=separators)
         self._email_generator     = EmailGenerator()
         
         # Param
@@ -63,15 +63,21 @@ class Guesser():
                     )
 
                     for email in self._emails[provider]:
+                        if(re.fullmatch(self.REGEX,email)):
+                            flag = email in self._validated_emails[provider]
+                            if flag:
+                                flag = self._validated_emails[provider][email] in [-1,None,"null"]
+                            else:
+                                flag = not flag
 
-                        if(re.fullmatch(self.REGEX,email)) and (self._validated_emails[provider][email] in [-1,None,"null"] or not email in self._validated_emails[provider]):
-                            self._validated_emails[provider][email] = -1
-                            while self._validated_emails[provider][email] == -1:
-                                try:
-                                    self._validated_emails[provider][email] = trio.run(self._email_generator.validate_email,email)
-                                except Exception as e:
-                                    print(e)
-                                    pass
+                            if flag:
+                                self._validated_emails[provider][email] = -1
+                                while self._validated_emails[provider][email] == -1:
+                                    try:
+                                        self._validated_emails[provider][email] = trio.run(self._email_generator.validate_email,email)
+                                    except Exception as e:
+                                        print(e)
+                                        pass
                         bar.next()
                     print("\tDone")
                     
@@ -112,7 +118,7 @@ class Guesser():
 
         # Path is "./output" but dir doesn't exist
         if output_location == "./output" and not os.path.isdir("./output"):
-            print("Creating directory ./output...",end=" ")
+            print("Creating directory \'./output\'...",end=" ")
             os.mkdir("./output")
 
         # Save json to file

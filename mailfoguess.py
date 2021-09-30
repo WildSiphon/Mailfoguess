@@ -25,10 +25,12 @@ def main(args):
                 resume = json.load(f)
             nb_emails = sum(len(resume["emails"][provider]) for provider in resume["emails"])
             nb_validated_emails = sum(len(resume["validated_emails"][provider]) for provider in resume["validated_emails"])
-            print(f"Resuming file {args.resume_path}:\n + {nb_emails} emails already generated")
+            print(f"Resuming file {args.resume_path}:")
+            print(f" + {len(resume['localparts'])} localparts already generated")
+            print(f" + {nb_emails} emails already generated")
             print(f" + {nb_validated_emails} emails already processed during validation step")
         else:
-            print(f"File {args.resume_path} is not a json file. Verify file, spelling or extension.")
+            exit(f"File {args.resume_path} is not a valid file. Verify file, spelling or extension (must be \'json\').\n")
 
 
     if resume:
@@ -61,8 +63,9 @@ def main(args):
         number     = number,
     )
     guesser = Guesser(
-        user  = user,
-        level = args.level,
+        user       = user,
+        level      = args.level,
+        separators = args.separators,
     )
 
     if resume: guesser.resume(data=resume)
@@ -73,7 +76,7 @@ def main(args):
     print("\n============================= LOCAL-PART =============================")
     print(f"Generating level: {guesser.level}")
     print(f"Using separators: {guesser.separators}")
-    print(f"Number generated: {len(guesser.localparts)} generated")
+    print(f"Number generated: {len(guesser.localparts)} generated in total")
     if print_more and nb_print_localparts!=0:
         print("Local-parts",end=f" (printing only {nb_print_localparts}):\n - " if len(guesser.localparts)>nb_print_localparts else ":\n - ")
         if len(guesser.localparts)>nb_print_localparts:
@@ -83,7 +86,7 @@ def main(args):
 
     print("\n================================ EMAILS ==============================")
     nb_emails = sum(len(guesser.emails[provider]) for provider in guesser.emails)
-    print(f"Emails      : {nb_emails} generated (with {len(guesser.providers)} different domains)")
+    print(f"Emails      : {nb_emails} generated in total with {len(guesser.providers)} different domains")
     print(f"Domains used:")
     for provider in guesser.providers:
         print(f" + {provider} ({len(guesser.emails[provider])})",end=":\n\t- " if print_more and nb_print_emails!=0 else "\n")
@@ -206,7 +209,16 @@ if __name__ == "__main__":
         nargs="?",
         default=None,
         required=False,
-        help="select a json file to enrich or resume",
+        help="select a json file to resume or enrich wich new options",
+    )
+    generation_parameters.add_argument(
+        "--separators","-s",
+        dest="separators",
+        nargs="?",
+        type=str,
+        default="-._",
+        required=False,
+        help="set separators used for the generation of local-parts (default are \'-._\')",
     )
 
     #~~~~~~~~~~~~~~~~~ OUTPUT PARAMETERS ~~~~~~~~~~~~~~~~~#
