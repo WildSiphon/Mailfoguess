@@ -5,13 +5,7 @@ import argparse
 from modules.user import User
 from modules.guesser import Guesser
 
-def printBanner():
-    for line in open("assets/banner.txt","r"):
-        print(line.replace('\n',''))
-    print()
-
 def main(args):
-    printBanner()
 
     print_more          = args.print_informations
     nb_print_localparts = args.nb_print_localparts
@@ -30,15 +24,14 @@ def main(args):
             print(f" + {nb_emails} emails already generated")
             print(f" + {nb_validated_emails} emails already processed during validation step")
         else:
-            exit(f"File {args.resume_path} is not a valid file. Verify file, spelling or extension (must be \'json\').\n")
-
+            exit(f"File {args.resume_path} is not a valid file or doesn\'t exist. Verify file, spelling or extension (must be \'json\').\n")
 
     if resume:
-        firstname  = resume["firstname"] if resume["firstname"] else ""
+        firstname  = resume["firstname"]  if resume["firstname"]  else ""
         middlename = resume["middlename"] if resume["middlename"] else ""
-        lastname   = resume["lastname"] if resume["lastname"] else ""
-        username   = resume["username"] if resume["username"] else ""
-        number     = resume["number"] if resume["number"] else ""
+        lastname   = resume["lastname"]   if resume["lastname"]   else ""
+        username   = resume["username"]   if resume["username"]   else ""
+        number     = resume["number"]     if resume["number"]     else ""
     elif not (args.firstname or args.middlename or args.lastname or args.username):
         print("Please provide indications to generate potentials emails (leave empty for \"None\")")
         firstname  = input("\nFirstname ?\n> ")
@@ -65,7 +58,7 @@ def main(args):
     guesser = Guesser(
         user       = user,
         level      = args.level,
-        separators = args.separators,
+        separators = "-._"+args.separators,
     )
 
     if resume: guesser.resume(data=resume)
@@ -109,14 +102,16 @@ def main(args):
         print(f" + verified     : {stats[1]}")
         print(f" + unverified   : {stats[2]}")
         print(f" + non-existent : {stats[3]}")
-        print(f" + unprocessed  : {stats[4]}")
+        if stats[4]:
+            print(f" + unprocessed  : {stats[4]}")
         if stats[1]:
             print("By provider :")
             for provider in guesser.validated_emails:
                 verified_emails = guesser.verified_emails(provider=provider)
                 if verified_emails:
                     print(f" + {provider}: {len(verified_emails)} verified adress found!",end=":\n\t- " if print_more and nb_print_verified!=0 else "\n")
-                    if print_more and nb_print_verified!=0:
+                    if nb_print_verified!=0:
+                        print("\t- ",end="")
                         if nb_print_verified:
                             printable_verified = verified_emails[:int(nb_print_emails/2)] + ["..."] + verified_emails[len(verified_emails)-int(nb_print_emails/2):]
                         else: printable_verified = verified_emails
@@ -216,7 +211,7 @@ if __name__ == "__main__":
         dest="separators",
         nargs="?",
         type=str,
-        default="-._",
+        default="",
         required=False,
         help="set separators used for the generation of local-parts (default are \'-._\')",
     )
@@ -227,7 +222,15 @@ if __name__ == "__main__":
         description="Select how the data will be displayed and/or saved",
     )
     output_parameters.add_argument(
-        "--print","-P",
+        "--no-banner",
+        dest="nobanner",
+        required=False,
+        default=False,
+        action="store_true",
+        help="doesn't display banner",
+    )
+    output_parameters.add_argument(
+        "--print-more","-P",
         dest="print_informations",
         action="store_true",
         default=False,
@@ -276,4 +279,10 @@ if __name__ == "__main__":
 
     #~~~~~~~~~~~~~~~~~ OPTIONALS PARAMETERS ~~~~~~~~~~~~~~~~~#
 
-    main(arguments.parse_args())
+
+    args = arguments.parse_args()
+
+    if not args.nobanner:
+        print(open("assets/banner.txt", "r").read())
+
+    main(args)

@@ -1,38 +1,40 @@
 import json
-import time
 import httpx
+import string
 
 from holehe.modules.mails.google import google
 from holehe.modules.mails.laposte import laposte
 from holehe.modules.mails.protonmail import protonmail
 from holehe.modules.mails.yahoo import yahoo
 
-class EmailGenerator():
+
+class EmailGenerator:
     """Create a generator of emails
 
     :param country: country to set
     :type country: str
     """
 
-    def __init__(self,country="fr"):
+    def __init__(self, country="fr"):
         """The constructor."""
-        self.__providers  = self._set_providers(country=country)
-        self.__validators = ["gmail","laposte","protonmail","yahoo"]
+        self.__providers = self._set_providers(country=country)
+        self.__validators = ["gmail", "laposte", "protonmail", "yahoo"]
+        self.__punctuation = string.punctuation
 
-    def _set_providers(self,country):
-        """Set the providers used for the generation 
+    def _set_providers(self, country):
+        """Set the providers used for the generation
         by choosing from a list and keeping only the good ones."""
-        with open(("./ressources/providers.json"),"r") as f:
+        with open(("./ressources/providers.json"), "r") as f:
             providers = json.load(f)
         providers = providers["test"]
         return providers
 
-    def _create_email(self,username,domain):
+    def _create_email(self, username, domain):
         """Create an email by concatening param and following rules
 
         :param username: local-part of email
         :type username: str
-        
+
         :param username: domain of email
         :type username: str
 
@@ -40,59 +42,64 @@ class EmailGenerator():
         :rtype: str
         """
 
-        mail = username+"@"+domain
+        mail = username + "@" + domain
 
         # https://support.google.com/mail/answer/9211434?hl=en
-        if 'gmail' in domain:
+        if "gmail" in domain:
             if (len(username) < 6) or (len(username) > 30):
                 return
-            if ('-' in username) or ('_' in username):
+            if any(x in username for x in self.__punctuation.replace(".", "")):
+                return
+            if username[0] == "." or username[-1] == ".":
                 return
             # if ('.' in username):
             #     return
-            
+
         # https://login.yahoo.com/account/create
-        if 'yahoo' in domain:
+        if "yahoo" in domain:
             if (len(username) < 4) or (len(username) > 32):
                 return
-            if ('-' in username):
+            if any(
+                x in username
+                for x in self.__punctuation.replace(".", "").replace("_", "")
+            ):
                 return
-            
-        if 'outlook' in domain:
+
+        if "outlook" in domain:
             if (len(username) < 1) or (len(username) > 64):
                 return
-        
+
         # https://compte.laposte.net/inscription/index.do?srv_gestion=lapostefr
-        if 'laposte' in domain:
+        if "laposte" in domain:
             if (len(username) < 4) or (len(username) > 49):
                 return
-        
+
         # https://mail.protonmail.com/create/
-        if 'protonmail' in domain:
+        if "protonmail" in domain:
             if (len(username) < 1) or (len(username) > 40):
                 return
             # if ('-' in username) or ('_' in username) or ('.' in username):
             #     return
-            
+
         # https://subscribe.free.fr/accesgratuit/
-        if 'free' in domain:
+        if "free" in domain:
             if (len(username) < 1) or (len(username) > 20):
                 return
-            if ('-' in username) or ('_' in username):
+            if ("-" in username) or ("_" in username):
                 return
-        
+
         # https://login.orange.fr/signup
-        if 'orange' in domain:
+        if "orange" in domain:
             if (len(username) < 1) or (len(username) > 64):
                 return
 
         return mail
 
-    async def validate_email(self,email):
+    async def validate_email(self, email):
         try:
             out = []
             client = httpx.AsyncClient()
-            
+
             domain = email.split("@")[-1].split(".")[0]
 
             if domain == "gmail":
@@ -109,10 +116,10 @@ class EmailGenerator():
             print(e)
         finally:
             await client.aclose()
-        
-        return out[0]['exists']
 
-    def generate(self,usernames: list):
+        return out[0]["exists"]
+
+    def generate(self, usernames: list):
         """Generate emails from a list of usernames
 
         :param usernames: list of usernames
@@ -125,10 +132,11 @@ class EmailGenerator():
         for domain in self.__providers:
             emails[domain] = []
             for username in usernames:
-                email = self._create_email(domain=domain,username=username)
-                if email: emails[domain].append(email)
+                email = self._create_email(domain=domain, username=username)
+                if email:
+                    emails[domain].append(email)
         return emails
-    
+
     @property
     def providers(self):
         return self.__providers
@@ -136,4 +144,3 @@ class EmailGenerator():
     @property
     def validators(self):
         return self.__validators
-        
