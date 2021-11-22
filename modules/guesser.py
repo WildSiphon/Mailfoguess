@@ -127,8 +127,8 @@ class Guesser:
         # Set the name of the output file
         output_name = (
             f"{self._user.firstname  if self._user.firstname  else ''}"
-            + f"{self._user.middlename if self._user.middlename else ''}"
-            + f"{self._user.lastname   if self._user.lastname   else ''}"
+            f"{self._user.middlename if self._user.middlename else ''}"
+            f"{self._user.lastname   if self._user.lastname   else ''}"
         )
         output_name = output_name.replace(" ", "")
 
