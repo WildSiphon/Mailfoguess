@@ -293,6 +293,9 @@ if __name__ == "__main__":
     args = arguments.parse_args()
 
     if not args.nobanner:
-        print(open("assets/banner.txt", "r").read())
+        try:
+            print(open("assets/banner.txt", "r").read())
+        except:
+            pass
 
     main(args)
