@@ -1,6 +1,6 @@
 # [Mailfoguess](https://github.com/WildSiphon/Mailfoguess)
 
-**OSINT tool** to **guess** and **verify** the **email address of a person** from  information such as firstname, middlename, lastname, username...    
+**OSINT tool** to **guess** and **verify** (experimental) the **email address of a person** from  information such as firstname, middlename, lastname, username...    
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4a1.png" alt="bulb" style="zoom:33%;" /> The script
 
@@ -10,7 +10,9 @@ An email address is made up from **local-part**, the symbol **@**, and a **domai
 
 - **Create *a lot* of possible local-part** from informations given and following generation level 
 - **Add @domain to all local-part** respecting the conditions of creation of mail of these domains
-- **Verify these mails** (only for "gmail","laposte","protonmail","yahoo")
+- Optional: **Verify these mails** (only for "gmail","laposte","protonmail","yahoo")
+
+**WARNING: Mailfoguess uses [holehe](https://github.com/megadose/holehe) to verify the generated mails. It can lead to false results due to rate limit or else.**
 
 ## <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" alt="hammer_and_wrench" style="zoom:33%;" /> Installation
 
