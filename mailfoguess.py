@@ -90,35 +90,37 @@ def main(args):
             elif nb_print_emails: printable_emails = emails_from_provider
             print(*printable_emails,sep="\n\t- ")
 
-    print("\n#~~~~~~~~~~~~~~~~~~~~ VALIDATION ~~~~~~~~~~~~~~~~~~~~#")
-    try:
-        guesser.validate(validate_all=args.validate_all)
-    except KeyboardInterrupt as e:
-        print("\n[ctrl+c] Script interrupted by user.")
-    finally:
-        print("\n#~~~~~~~~~~~~~~~~~~~~~ RESULTS ~~~~~~~~~~~~~~~~~~~~~~#")
-        stats = guesser.validated_emails_stats()
-        print(f"Address processed : {stats[0]}")
-        print(f" + verified     : {stats[1]}")
-        print(f" + unverified   : {stats[2]}")
-        print(f" + non-existent : {stats[3]}")
-        if stats[4]:
-            print(f" + unprocessed  : {stats[4]}")
-        if stats[1]:
-            print("By provider :")
-            for provider in guesser.validated_emails:
-                verified_emails = guesser.verified_emails(provider=provider)
-                if verified_emails:
-                    print(f" + {provider}: {len(verified_emails)} verified adress found!",end=":\n\t- " if print_more and nb_print_verified!=0 else "\n")
-                    if nb_print_verified!=0:
-                        print("\t- ",end="")
-                        if nb_print_verified:
-                            printable_verified = verified_emails[:int(nb_print_emails/2)] + ["..."] + verified_emails[len(verified_emails)-int(nb_print_emails/2):]
-                        else: printable_verified = verified_emails
-                        print(*printable_verified,sep="\n\t- ")
-        print()
+    if args.verify:
+        print("\n#~~~~~~~~~~~~~~~~~~~~ VALIDATION ~~~~~~~~~~~~~~~~~~~~#")
+        try:
+            print("WARNING: Mailfoguess uses https://github.com/megadose/holehe to verify the generated mails. It can lead to false results due to rate limit or else.")
+            guesser.validate(validate_all=args.validate_all)
+        except KeyboardInterrupt as e:
+            print("\n[ctrl+c] Script interrupted by user.")
+        finally:
+            print("\n#~~~~~~~~~~~~~~~~~~~~~ RESULTS ~~~~~~~~~~~~~~~~~~~~~~#")
+            stats = guesser.validated_emails_stats()
+            print(f"Address processed : {stats[0]}")
+            print(f" + verified     : {stats[1]}")
+            print(f" + unverified   : {stats[2]}")
+            print(f" + non-existent : {stats[3]}")
+            if stats[4]:
+                print(f" + unprocessed  : {stats[4]}")
+            if stats[1]:
+                print("By provider :")
+                for provider in guesser.validated_emails:
+                    verified_emails = guesser.verified_emails(provider=provider)
+                    if verified_emails:
+                        print(f" + {provider}: {len(verified_emails)} verified adress found!",end=":\n\t- " if print_more and nb_print_verified!=0 else "\n")
+                        if nb_print_verified!=0:
+                            print("\t- ",end="")
+                            if nb_print_verified:
+                                printable_verified = verified_emails[:int(nb_print_emails/2)] + ["..."] + verified_emails[len(verified_emails)-int(nb_print_emails/2):]
+                            else: printable_verified = verified_emails
+                            print(*printable_verified,sep="\n\t- ")
+    print()
 
-        guesser.save(output_location=args.output_location)
+    guesser.save(output_location=args.output_location)
 
 if __name__ == "__main__":
     arguments = argparse.ArgumentParser(
@@ -182,12 +184,20 @@ if __name__ == "__main__":
         description="Set parameters concerning the generation",
     )
     generation_parameters.add_argument(
+        "--verify","-V",
+        dest="verify",
+        action="store_true",
+        default=False,
+        required=False,
+        help="tries to verify the addresses using holehe (https://github.com/megadose/holehe)",
+    )
+    generation_parameters.add_argument(
         "--yes","-Y",
         dest="validate_all",
         action="store_true",
         default=False,
         required=False,
-        help="assumes \"yes\" as the answer to all questions of validation",
+        help="assumes \"yes\" as the answer to all questions of validation (only with option --verify)",
     )
     generation_parameters.add_argument(
         "--level","-L",
