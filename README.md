@@ -49,6 +49,7 @@ Target:
 Generation:
   Set parameters concerning the generation
 
+  --verify, -V          tries to verify the addresses using holehe (https://github.com/megadose/holehe)
   --yes, -Y             assumes "yes" as the answer to all questions of validation
   --level {min,low,high,max}, -L {min,low,high,max}
                         choose level of generation (default 'min')
